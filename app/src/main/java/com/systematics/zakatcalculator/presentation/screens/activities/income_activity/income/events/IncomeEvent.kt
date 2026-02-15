@@ -1,0 +1,15 @@
+package com.systematics.zakatcalculator.presentation.screens.activities.income_activity.income.events
+
+import com.systematics.zakatcalculator.presentation.screens.activities.fitrah_activity.fitrah.state.FitrahTab
+
+sealed class IncomeEvent {
+    data class UpdateIncome(val income: String) : IncomeEvent()
+    data class UpdateExpense(val expense: String) : IncomeEvent()
+    data class UpdateGoldPrice(val goldPrice: String) : IncomeEvent()
+    data class UpdateRequirement1(val value: Boolean) : IncomeEvent()
+    data class UpdateRequirement2(val value: Boolean) : IncomeEvent()
+    data class UpdateRequirement3(val value: Boolean) : IncomeEvent()
+    data class UpdateRequirement4(val value: Boolean) : IncomeEvent()
+    data class UpdateTab(val tab: FitrahTab) : IncomeEvent()
+    object TogglePaidStatus : IncomeEvent()
+}
