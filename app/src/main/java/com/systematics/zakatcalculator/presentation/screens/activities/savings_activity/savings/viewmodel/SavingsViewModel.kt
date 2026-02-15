@@ -2,6 +2,7 @@ package com.systematics.zakatcalculator.presentation.screens.activities.savings_
 
 import androidx.lifecycle.ViewModel
 import com.systematics.zakatcalculator.presentation.screens.activities.savings_activity.savings.events.SavingsEvent
+import com.systematics.zakatcalculator.presentation.screens.activities.savings_activity.savings.state.SavingsCalculationResult
 import com.systematics.zakatcalculator.presentation.screens.activities.savings_activity.savings.state.SavingsState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,6 +23,40 @@ class SavingsViewModel : ViewModel() {
             is SavingsEvent.UpdateRequirement3 -> _state.update { it.copy(requirement3 = event.value) }
             is SavingsEvent.UpdateTab -> _state.update { it.copy(selectedTab = event.tab) }
             SavingsEvent.TogglePaidStatus -> _state.update { it.copy(isPaid = !it.isPaid) }
+            SavingsEvent.Calculate -> calculateZakat()
+            SavingsEvent.ToggleSummary -> _state.update { it.copy(showSummary = !it.showSummary) }
+            SavingsEvent.ResetCalculation -> _state.update {
+                it.copy(calculationResult = null, showSummary = false)
+            }
+        }
+    }
+
+    private fun calculateZakat() {
+        val state = _state.value
+        val savings = state.savings.toDoubleOrNull() ?: 0.0
+        val interests = state.interests.toDoubleOrNull() ?: 0.0
+        val goldPrice = state.goldPrice.toDoubleOrNull() ?: 0.0
+
+        val netSavings = (savings - interests).coerceAtLeast(0.0)
+        val nisab = goldPrice * 85.0
+
+        if (goldPrice > 0.0 && netSavings >= nisab) {
+            val zakat = netSavings * 0.025
+            _state.update {
+                it.copy(
+                    calculationResult = SavingsCalculationResult.Success(
+                        amount = String.format("%,.0f", zakat)
+                    ),
+                    showSummary = false
+                )
+            }
+        } else {
+            _state.update {
+                it.copy(
+                    calculationResult = SavingsCalculationResult.BelowNisab,
+                    showSummary = false
+                )
+            }
         }
     }
 }

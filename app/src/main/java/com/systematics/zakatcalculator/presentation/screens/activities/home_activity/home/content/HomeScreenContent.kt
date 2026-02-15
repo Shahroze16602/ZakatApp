@@ -1,22 +1,63 @@
 package com.systematics.zakatcalculator.presentation.screens.activities.home_activity.home.content
 
 import android.content.Intent
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.BrightnessHigh
+import androidx.compose.material.icons.filled.BrightnessMedium
+import androidx.compose.material.icons.filled.CardGiftcard
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.MonetizationOn
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ShoppingBag
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Wallet
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -31,18 +72,22 @@ import com.systematics.zakatcalculator.presentation.screens.activities.income_ac
 import com.systematics.zakatcalculator.presentation.screens.activities.rikaz_activity.RikazActivity
 import com.systematics.zakatcalculator.presentation.screens.activities.savings_activity.SavingsActivity
 import com.systematics.zakatcalculator.presentation.screens.activities.silver_activity.SilverActivity
-import com.systematics.zakatcalculator.ui.theme.*
+import com.systematics.zakatcalculator.ui.theme.ZakatCalculatorTheme
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.chrono.HijrahDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoField
-import java.util.*
+import java.util.Locale
 
 @Composable
 fun HomeScreenContent() {
     val pagerState = rememberPagerState(pageCount = { 3 })
     val scope = rememberCoroutineScope()
+
+    BackHandler(enabled = pagerState.currentPage != 0) {
+        scope.launch { pagerState.animateScrollToPage(0) }
+    }
 
     Scaffold(
         bottomBar = {
@@ -51,7 +96,12 @@ fun HomeScreenContent() {
                 tonalElevation = 8.dp
             ) {
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = stringResource(R.string.home)) },
+                    icon = {
+                        Icon(
+                            Icons.Default.Home,
+                            contentDescription = stringResource(R.string.home)
+                        )
+                    },
                     label = { Text(stringResource(R.string.home)) },
                     selected = pagerState.currentPage == 0,
                     onClick = { scope.launch { pagerState.animateScrollToPage(0) } },
@@ -62,7 +112,12 @@ fun HomeScreenContent() {
                     )
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Book, contentDescription = stringResource(R.string.learn)) },
+                    icon = {
+                        Icon(
+                            Icons.Default.Book,
+                            contentDescription = stringResource(R.string.learn)
+                        )
+                    },
                     label = { Text(stringResource(R.string.learn)) },
                     selected = pagerState.currentPage == 1,
                     onClick = { scope.launch { pagerState.animateScrollToPage(1) } },
@@ -73,7 +128,12 @@ fun HomeScreenContent() {
                     )
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings)) },
+                    icon = {
+                        Icon(
+                            Icons.Default.Settings,
+                            contentDescription = stringResource(R.string.settings)
+                        )
+                    },
                     label = { Text(stringResource(R.string.settings)) },
                     selected = pagerState.currentPage == 2,
                     onClick = { scope.launch { pagerState.animateScrollToPage(2) } },
@@ -86,15 +146,25 @@ fun HomeScreenContent() {
             }
         }
     ) { innerPadding ->
+
+        val layoutDirection = LocalLayoutDirection.current
+
+        val adjustedPadding = PaddingValues(
+            top = 0.dp,
+            bottom = innerPadding.calculateBottomPadding(),
+            start = innerPadding.calculateStartPadding(layoutDirection = layoutDirection),
+            end = innerPadding.calculateEndPadding(layoutDirection = layoutDirection)
+        )
+
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier.padding(innerPadding),
-            userScrollEnabled = false // Usually bottom nav pagers have swipe disabled or controlled
+            modifier = Modifier.padding(adjustedPadding),
+            userScrollEnabled = false
         ) { page ->
             when (page) {
                 0 -> HomeTabContent()
-                1 -> LearnScreen()
-                2 -> SettingsScreen()
+                1 -> LearnScreen(onBackClick = { scope.launch { pagerState.animateScrollToPage(0) } })
+                2 -> SettingsScreen(onBackClick = { scope.launch { pagerState.animateScrollToPage(0) } })
             }
         }
     }
@@ -143,6 +213,7 @@ fun HeaderSection() {
                 shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
             )
             .padding(24.dp)
+            .statusBarsPadding()
     ) {
         Column {
             Text(
@@ -166,12 +237,22 @@ fun HeaderSection() {
 fun DateCard() {
     val today = LocalDate.now()
     val hijrahDate = HijrahDate.from(today)
-    val hijrahFormatter = DateTimeFormatter.ofPattern("MMMM yyyy", Locale.ENGLISH)
-    val gregorianFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)
+    val hijrahFormatter = DateTimeFormatter.ofPattern(
+        stringResource(R.string.date_pattern_hijrah_month_year),
+        Locale.ENGLISH
+    )
+    val gregorianFormatter = DateTimeFormatter.ofPattern(
+        stringResource(R.string.date_pattern_gregorian_day_month_year),
+        Locale.ENGLISH
+    )
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.15f)),
+        modifier = Modifier.wrapContentWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.onPrimary.copy(
+                alpha = 0.15f
+            )
+        ),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -182,7 +263,10 @@ fun DateCard() {
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "${hijrahDate.format(hijrahFormatter)} AH",
+                text = stringResource(
+                    R.string.hijrah_date_with_suffix,
+                    hijrahDate.format(hijrahFormatter)
+                ),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onPrimary,
                 fontWeight = FontWeight.SemiBold
@@ -239,7 +323,10 @@ fun WelcomeCard() {
                         shape = RoundedCornerShape(12.dp),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                     ) {
-                        Text(stringResource(R.string.view_details), color = MaterialTheme.colorScheme.primary)
+                        Text(
+                            stringResource(R.string.view_details),
+                            color = MaterialTheme.colorScheme.primary
+                        )
                         Icon(
                             Icons.Default.ChevronRight,
                             contentDescription = null,
@@ -277,18 +364,36 @@ fun CategoryGrid(onCategoryClick: (CategoryItemData) -> Unit) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            CategoryItem(categories[0], Modifier.weight(1f), onClick = { onCategoryClick(categories[0]) })
-            CategoryItem(categories[1], Modifier.weight(1f), onClick = { onCategoryClick(categories[1]) })
-            CategoryItem(categories[2], Modifier.weight(1f), onClick = { onCategoryClick(categories[2]) })
+            CategoryItem(
+                categories[0],
+                Modifier.weight(1f),
+                onClick = { onCategoryClick(categories[0]) })
+            CategoryItem(
+                categories[1],
+                Modifier.weight(1f),
+                onClick = { onCategoryClick(categories[1]) })
+            CategoryItem(
+                categories[2],
+                Modifier.weight(1f),
+                onClick = { onCategoryClick(categories[2]) })
         }
         Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            CategoryItem(categories[3], Modifier.weight(1f), onClick = { onCategoryClick(categories[3]) })
-            CategoryItem(categories[4], Modifier.weight(1f), onClick = { onCategoryClick(categories[4]) })
-            CategoryItem(categories[5], Modifier.weight(1f), onClick = { onCategoryClick(categories[5]) })
+            CategoryItem(
+                categories[3],
+                Modifier.weight(1f),
+                onClick = { onCategoryClick(categories[3]) })
+            CategoryItem(
+                categories[4],
+                Modifier.weight(1f),
+                onClick = { onCategoryClick(categories[4]) })
+            CategoryItem(
+                categories[5],
+                Modifier.weight(1f),
+                onClick = { onCategoryClick(categories[5]) })
         }
     }
 }
@@ -380,7 +485,10 @@ fun ManageAssetsCard() {
                         shape = RoundedCornerShape(12.dp),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                     ) {
-                        Text(stringResource(R.string.view_details), color = MaterialTheme.colorScheme.primary)
+                        Text(
+                            stringResource(R.string.view_details),
+                            color = MaterialTheme.colorScheme.primary
+                        )
                         Icon(
                             Icons.Default.ChevronRight,
                             contentDescription = null,
@@ -431,7 +539,11 @@ fun VerseOfTheDayCard() {
                     .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(20.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Star, contentDescription = null, tint = MaterialTheme.colorScheme.onTertiary)
+                Icon(
+                    Icons.Default.Star,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSecondary
+                )
             }
             Spacer(modifier = Modifier.height(16.dp))
             Text(
@@ -442,7 +554,7 @@ fun VerseOfTheDayCard() {
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = "\"${verse.first}\"",
+                text = stringResource(R.string.quoted_text, verse.first),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,

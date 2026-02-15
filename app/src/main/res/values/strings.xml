@@ -46,7 +46,7 @@
     <string name="once_per_year">once per year</string>
     <string name="mark_as_done">Mark as done</string>
     <string name="edit">Edit</string>
-    <string name="requirements">Requirements (%1$d/3)</string>
+    <string name="requirements">Requirements (%1$d/%2$d)</string>
     <string name="silver_requirement_1">I own at least 612.36 grams of silver on any purity level.</string>
     <string name="silver_requirement_2">I owned it for at least one Islamic lunar year (hawl).</string>
     <string name="silver_requirement_3">The silver is not used for everyday jewelry.</string>
@@ -89,6 +89,7 @@
     <string name="gold_quantity">Gold quantity:</string>
     <string name="gold_quantity_placeholder">Gold quantity</string>
     <string name="gold_price">Gold price:</string>
+    <string name="gold_price_per_gram">gold price per gram</string>
     <string name="set_gold_price_prompt">Set gold price to see if you\'re qualified.</string>
     <string name="gold_price_placeholder">Gold price</string>
     <string name="gold_zakat_options">You have few options for your Zakat Gold:</string>
@@ -126,5 +127,88 @@
     <string name="total_result">Total Result</string>
     <string name="fitrah_do_i_have_to_pay_content">Zakat al-Fitr is a charity that is obligatory on every Muslim at the end of the month of Ramadan. It is a small amount of food or its equivalent in money, and it is given to the poor and needy.</string>
     <string name="fitrah_how_to_pay_content">Zakat al-Fitr can be paid in the form of staple food, such as rice, wheat, or dates. It can also be paid in cash. The amount of Zakat al-Fitr is equivalent to one sa’ (approximately 2.5 kg) of staple food.</string>
+
+    <string name="rice_price_per_kg">Rice price per kg</string>
+    <string name="rice_price_per_litre">Rice price per litre</string>
+    <string name="unit_kg">Kg</string>
+    <string name="unit_litre">Litre</string>
+
+    <string name="savings_zakat_description">Zakat is imposed on the total amount of savings kept in various types of accounts at banks or financial institutions.</string>
+    <string name="savings_requirement_1">I have savings kept in one or more types of accounts at banks or financial institutions.</string>
+    <string name="savings_requirement_2">The amount is at least the price of 85 grams of gold (3,825,000).</string>
+    <string name="savings_requirement_3">I\'ve kept it for at least one Islamic lunar year (hawl).</string>
+    <string name="calculate_zakat_savings">Calculate Zakat Savings</string>
+    <string name="savings_calculation_prompt">If you meet the requirements, please calculate below:</string>
+    <string name="savings_label">Savings</string>
+    <string name="interests_label">Interests</string>
+    <string name="interests_placeholder">If saving in a conventional bank</string>
+    <string name="current_gold_price_per_gram">Current gold price per gram</string>
+    <string name="about_zakat_savings">About Zakat Savings</string>
+    <string name="savings_do_i_have_to_pay_content">Yes, as soon as your wealth exceeds the threshold, known as the nisab, and one lunar year (hawl) has passed. The nisab is different for different types of wealth, but is generally equal to the value of 85 grams of gold in the currency used to pay zakat.</string>
+    <string name="savings_how_to_pay_content">You can pay Zakat online by transferring funds to the official account of the zakat management institution.</string>
+
+    <string name="income_zakat_description">Also known as zakat profession, paid on income earned from work or a profession. The amount paid is up to 2.5% of total net income.</string>
+    <string name="income_requirement_1">I have an income earned from work or a profession.</string>
+    <string name="income_requirement_2">I am able to fulfill my essential living expenses.</string>
+    <string name="income_requirement_3">My net annual income is at least the price of 85 grams of gold (3,825,000).</string>
+    <string name="income_requirement_4">It has been like this for at least one Islamic lunar year (hawl).</string>
+    <string name="calculate_zakat_income">Calculate Zakat Income</string>
+    <string name="income_calculation_prompt">If you have meet the requirements, please calculate below:</string>
+    <string name="income_label">Income</string>
+    <string name="income_placeholder">Including bonuses</string>
+    <string name="expense_label">Expense</string>
+    <string name="expense_placeholder">Including debt &amp; installments if any</string>
+    <string name="update">Update</string>
+    <string name="about_zakat_income">About Zakat Income</string>
+    <string name="income_zakat_info_description">Also known as zakat profession, this zakat is paid on income earned from work or a profession. It can be paid monthly or accumulated and paid at the end of the year. The amount paid is up to 2.5% of total net income.</string>
+    <string name="income_do_i_have_to_pay_content">Yes, you may need to pay zakat on your income if it meets certain requirements:\n\n- Income threshold: Your income must meet the nisab, which is the value of 85 grams of gold. The nisab is adjusted based on the current price of gold.\n\n- Time: You must pay zakat after an Islamic lunar year (hawl) has passed, or if you\'ve accumulated your income in a lump sum.\n\n- Ownership: You must be the sole owner of the wealth and be able to spend or dispose of it as you like.\n\n- Debt: You must pay or account for your current debts and essential living expenses. If what remains is above the nisab, then you must pay zakat.</string>
+    <string name="income_how_to_pay_content">You can pay Zakat online by transferring funds to the official account of the zakat management institution.</string>
+    <string name="income_below_nisab_message">You are still not required to pay Zakat Income. But you can pay for Infaq or Shadaqah.</string>
+
+    <string name="rikaz_zakat_description">Zakat on treasure is the requirement to give 20% of any hidden treasures or minerals found in one\'s land in charity.</string>
+    <string name="rikaz_requirement_1">When you find treasure</string>
+    <string name="calculate_zakat_rikaz">Calculate Zakat Rikaz</string>
+    <string name="rikaz_calculation_prompt">If you have meet the requirements, please calculate below:</string>
+    <string name="value_of_treasure">Value of treasure</string>
+    <string name="amount">Amount</string>
+    <string name="about_zakat_rikaz">About Zakat Rikaz</string>
+    <string name="rikaz_zakat_info_description">Zakat on treasure is the requirement to give 20% of any hidden treasures or minerals found in one\'s land in charity. This includes treasures found in mines, such as gold and silver mines, and precious metals.\n\nRikaz refers to anything hidden in the ground, and if a Muslim finds any buried treasures, especially those that have been hidden for a long time, they must pay one-fifth of it as zakat immediately.</string>
+    <string name="rikaz_do_i_have_to_pay_content">According to Islamic law, if someone finds treasure such as gold or silver that has been buried or hidden in the ground, he is obliged to pay zakat on that treasure.</string>
+    <string name="rikaz_how_to_pay_content">You can pay Zakat online by transferring funds to the official account of the zakat management institution.</string>
+    <string name="savings_below_nisab_message">You are still not required to pay Zakat Savings. But you can pay for Infaq or Shadaqah.</string>
+    <string name="net_savings">Net savings</string>
+    <string name="net_income">Net income</string>
+    <string name="nisab_threshold">Nisab threshold</string>
+    <string name="not_required">Not required</string>
+
+    <string name="what_is_zakat">What is Zakat?</string>
+    <string name="what_is_the_purpose">What is the purpose?</string>
+    <string name="who_pays_zakat">Who pays Zakat?</string>
+    <string name="who_receives">Who receives?</string>
+    <string name="zakat_fitrah">Zakat Fitrah</string>
+    <string name="zakat_mal">Zakat Mal</string>
+    <string name="learn_what_is_zakat_content">Zakat is a religious obligation for Muslims to donate a portion of their wealth to charitable causes. The word zakat literally means purification. It is one of the Five Pillars of Islam and is essential for self-purification and helping others.</string>
+    <string name="learn_purpose_content">Zakat is meant to purify Muslims\' property and soul from faults like greed, stinginess, and meanness. It can help reduce poverty, build social harmony, and encourage generosity. Muslims believe that paying zakat purifies, increases, and blesses their remaining wealth.</string>
+    <string name="learn_who_pays_intro">Muslims who meet the following criteria are required to pay zakat:</string>
+    <string name="learn_who_pays_1">- Sound mind: The person must be of sound mind and not have a disturbed mental condition.</string>
+    <string name="learn_who_pays_2">- Baligh: The person must have reached the age of puberty, which is marked by dreams for men and menstruation for women.</string>
+    <string name="learn_who_pays_3">- Wealth reaches Nisab: The person\'s wealth must reach the predetermined minimum limit, known as the Nisab.</string>
+    <string name="learn_who_pays_4">- Assets reach Hawl: The person\'s wealth must have reached the age of one Islamic year, as adjusted to the Hijri calendar.</string>
+    <string name="learn_who_receives_content">Zakat is given to the poor, travelers in need, and other designated groups of people.</string>
+    <string name="learn_types_intro">There are two main categories of Zakat, namely:</string>
+    <string name="learn_zakat_fitrah_content">Zakat fitrah is a charitable donation of food that Muslims are required to pay during the month of Ramadan and before the Eid prayer on 1 Shawwal. It is a mandatory annual payment for every Muslim, regardless of age, gender, or wealth.</string>
+    <string name="learn_zakat_mal_content">Zakat al-mal, commonly referred to as zakat on wealth or alms-giving, is paid on money, gold, and other valuable assets. Zakat al-mal is calculated as 2.5% of an individual\'s wealth. Assets that have been owned for one Islamic year (hawl) are subject to zakat al-mal.</string>
+    <string name="learn_dua_content">The dua to say when paying zakat means: O Allah, make it a gain and do not make it a loss. This is said by the Messenger of Allah, as narrated by Abu Hurayrah.</string>
+    <string name="learn_dua_note_content">It is mandatory to make an intention to give zakat, either when organizing the payment or when making the payment. If a donation is made without the intention of zakat, it will not be counted as zakat.</string>
+
+    <string name="share_app_text">Check out this Zakat Calculator app: [App Link]</string>
+    <string name="mime_text_plain">text/plain</string>
+    <string name="privacy_policy_url">https://www.example.com</string>
+    <string name="rate_us_market_url">market://details?id=%1$s</string>
+
+    <string name="date_pattern_hijrah_month_year">MMMM yyyy</string>
+    <string name="date_pattern_gregorian_day_month_year">dd MMMM yyyy</string>
+    <string name="hijrah_date_with_suffix">%1$s AH</string>
+    <string name="quoted_text">"%1$s"</string>
 
 </resources>

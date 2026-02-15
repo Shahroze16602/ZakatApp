@@ -3,30 +3,56 @@ package com.systematics.zakatcalculator.presentation.screens.activities.home_act
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.PanTool
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.systematics.zakatcalculator.R
+import com.systematics.zakatcalculator.presentation.screens.components.CommonAppBar
 import com.systematics.zakatcalculator.ui.theme.ZakatCalculatorTheme
 
 @Composable
-fun LearnScreenContent() {
+fun LearnScreenContent(onBackClick: () -> Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -34,47 +60,12 @@ fun LearnScreenContent() {
             .verticalScroll(rememberScrollState())
             .padding(bottom = 24.dp)
     ) {
-        LearnHeader()
+        CommonAppBar(
+            title = stringResource(R.string.learn),
+            onBackClick = onBackClick
+        )
         Spacer(modifier = Modifier.height(24.dp))
         LearnList()
-    }
-}
-
-@Composable
-fun LearnHeader() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                brush = Brush.horizontalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primary,
-                        MaterialTheme.colorScheme.primaryContainer
-                    )
-                ),
-                shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
-            )
-            .padding(top = 24.dp, bottom = 24.dp, start = 16.dp, end = 16.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            IconButton(onClick = { /* Handle back */ }) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBackIosNew,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = stringResource(R.string.learn),
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onPrimary,
-                fontWeight = FontWeight.Bold
-            )
-        }
     }
 }
 
@@ -121,7 +112,10 @@ fun ExpandableLearnItemCard(item: LearnItemData) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { expanded = !expanded },
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) { expanded = !expanded },
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -145,7 +139,7 @@ fun ExpandableLearnItemCard(item: LearnItemData) {
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color.DarkGray
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Box(
                     modifier = Modifier
@@ -170,49 +164,85 @@ fun ExpandableLearnItemCard(item: LearnItemData) {
 
 @Composable
 fun DefinitionPurposeContent() {
-    Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("What is Zakat?", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        Text("Zakat is a religious obligation for Muslims to donate a portion of their wealth to charitable causes. The word \"zakat\" literally means \"purification\". It is one of the Five Pillars of Islam and is essential for self-purification and helping others.")
+    Column(
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            stringResource(R.string.what_is_zakat),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Text(stringResource(R.string.learn_what_is_zakat_content))
         Spacer(modifier = Modifier.height(8.dp))
-        Text("What is the purpose?", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        Text("Zakat is meant to purify Muslims’ property and soul from faults like greed, stinginess, and meanness. It can help reduce poverty, build social harmony, and encourage generosity. Muslims believe that paying zakat purifies, increases, and blesses their remaining wealth.")
+        Text(
+            stringResource(R.string.what_is_the_purpose),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Text(stringResource(R.string.learn_purpose_content))
     }
 }
 
 @Composable
 fun WhoToGiveContent() {
-    Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("Who pays Zakat?", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        Text("Muslims who meet the following criteria are required to pay zakat:")
-        Text("• Sound mind: The person must be of sound mind and not have a disturbed mental condition.")
-        Text("• Baligh: The person must have reached the age of puberty, which is marked by dreams for men and menstruation for women.")
-        Text("• Wealth reaches Nisab: The person’s wealth must reach the predetermined minimum limit, known as the Nisab.")
-        Text("• Assets reach Hawl: The person’s wealth must have reached the age of one Islamic year, as adjusted to the Hijri calendar.")
+    Column(
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            stringResource(R.string.who_pays_zakat),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Text(stringResource(R.string.learn_who_pays_intro))
+        Text(stringResource(R.string.learn_who_pays_1))
+        Text(stringResource(R.string.learn_who_pays_2))
+        Text(stringResource(R.string.learn_who_pays_3))
+        Text(stringResource(R.string.learn_who_pays_4))
         Spacer(modifier = Modifier.height(8.dp))
-        Text("Who receives?", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        Text("Zakat is given to the poor, travelers in need, and other designated groups of people.")
+        Text(
+            stringResource(R.string.who_receives),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Text(stringResource(R.string.learn_who_receives_content))
     }
 }
 
 @Composable
 fun TypesOfZakatContent() {
-    Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("There are two main categories of Zakat, namely:")
+    Column(
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(stringResource(R.string.learn_types_intro))
         Spacer(modifier = Modifier.height(8.dp))
-        Text("Zakat Fitrah", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        Text("Zakat fitrah is a charitable donation of food that Muslims are required to pay during the month of Ramadan and before the Eid prayer on 1 Shawwal. It is a mandatory annual payment for every Muslim, regardless of age, gender, or wealth.")
+        Text(
+            stringResource(R.string.zakat_fitrah),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Text(stringResource(R.string.learn_zakat_fitrah_content))
         Spacer(modifier = Modifier.height(8.dp))
-        Text("Zakat Mal", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        Text("Zakat al-mal commonly referred to as “zakat on wealth” or “alms-giving,” is paid on money, gold, and other valuable assets. Zakat al-mal is calculated as 2.5% of an individual’s wealth. Assets that have been owned for one Islamic year (hawl) are subject to zakat al-mal.")
+        Text(
+            stringResource(R.string.zakat_mal),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Text(stringResource(R.string.learn_zakat_mal_content))
     }
 }
 
 @Composable
 fun DuaContent() {
-    Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("The dua to say when paying zakat is, اللَّهُمَّ اجْعَلْهَا مَغْنَمًا وَلَا تَجْعَلْهَا مَغْرَمًا which means “O Allah, make it a gain and do not make it a loss”. This is said by the Messenger of Allah, as narrated by Abū Hurayrah.")
+    Column(
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(stringResource(R.string.learn_dua_content))
         Spacer(modifier = Modifier.height(8.dp))
-        Text("It is mandatory to make an intention to give zakat, either when organizing the payment or when making the payment. If a donation is made without the intention of zakat, it will not be counted as zakat.")
+        Text(stringResource(R.string.learn_dua_note_content))
     }
 }
 

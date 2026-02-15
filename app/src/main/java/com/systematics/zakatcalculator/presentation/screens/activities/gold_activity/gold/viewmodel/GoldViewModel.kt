@@ -42,8 +42,11 @@ class GoldViewModel : ViewModel() {
             is GoldEvent.Calculate -> {
                 calculateZakat()
             }
+            is GoldEvent.ToggleSummary -> {
+                _state.update { it.copy(showSummary = !it.showSummary) }
+            }
             is GoldEvent.ResetCalculation -> {
-                _state.update { it.copy(calculationResult = null) }
+                _state.update { it.copy(calculationResult = null, showSummary = false) }
             }
         }
     }
@@ -63,11 +66,17 @@ class GoldViewModel : ViewModel() {
                     calculationResult = GoldCalculationResult.Success(
                         grams = String.format("%.2f", zakatGrams),
                         cash = String.format("%,.0f", zakatCash)
-                    )
+                    ),
+                    showSummary = false
                 )
             }
         } else {
-            _state.update { it.copy(calculationResult = GoldCalculationResult.BelowNisab) }
+            _state.update {
+                it.copy(
+                    calculationResult = GoldCalculationResult.BelowNisab,
+                    showSummary = false
+                )
+            }
         }
     }
 }

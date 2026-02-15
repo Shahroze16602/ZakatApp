@@ -1,23 +1,55 @@
 package com.systematics.zakatcalculator.presentation.screens.activities.silver_activity.silver.content
 
 import android.app.Activity
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -29,8 +61,15 @@ import com.systematics.zakatcalculator.R
 import com.systematics.zakatcalculator.presentation.screens.activities.silver_activity.silver.events.SilverEvent
 import com.systematics.zakatcalculator.presentation.screens.activities.silver_activity.silver.state.SilverCalculationResult
 import com.systematics.zakatcalculator.presentation.screens.activities.silver_activity.silver.state.SilverState
-import com.systematics.zakatcalculator.presentation.screens.activities.silver_activity.silver.state.SilverTab
+import com.systematics.zakatcalculator.presentation.screens.components.CommonAppBar
+import com.systematics.zakatcalculator.presentation.screens.components.CommonInfoBox
+import com.systematics.zakatcalculator.presentation.screens.components.CommonInfoExpandableItem
+import com.systematics.zakatcalculator.presentation.screens.components.CommonInputFieldLabel
+import com.systematics.zakatcalculator.presentation.screens.components.CommonPaidStatusCard
+import com.systematics.zakatcalculator.presentation.screens.components.CommonZakatTabs
+import com.systematics.zakatcalculator.presentation.screens.models.ZakatTab
 import com.systematics.zakatcalculator.ui.theme.ZakatCalculatorTheme
+import com.systematics.zakatcalculator.utils.Utils
 
 @Composable
 fun SilverScreenContent(
@@ -39,7 +78,14 @@ fun SilverScreenContent(
 ) {
     val context = LocalContext.current
 
-    Scaffold {
+    Scaffold(
+        topBar = {
+            CommonAppBar(
+                title = stringResource(R.string.cat_silver),
+                onBackClick = { (context as? Activity)?.finish() }
+            )
+        }
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -52,134 +98,54 @@ fun SilverScreenContent(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            brush = Brush.horizontalGradient(
-                                colors = listOf(
-                                    MaterialTheme.colorScheme.primary,
-                                    MaterialTheme.colorScheme.primaryContainer
-                                )
-                            ),
-                            shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
-                        )
-                        .padding(top = 48.dp, bottom = 24.dp, start = 16.dp, end = 16.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = { (context as? Activity)?.finish() }) {
-                            Icon(
-                                Icons.Default.ChevronLeft,
-                                contentDescription = stringResource(R.string.back),
-                                tint = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
-                        Text(
-                            text = stringResource(R.string.cat_silver),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Column(Modifier.padding(16.dp)){
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
-                        shape = RoundedCornerShape(16.dp),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = stringResource(R.string.fitrah_zakat_description),
-                            modifier = Modifier.padding(16.dp),
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onTertiaryContainer
-                        )
-                    }
+                Column(Modifier.padding(16.dp)) {
+                    CommonInfoBox(text = stringResource(R.string.silver_zakat_description))
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Status Card
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        shape = RoundedCornerShape(32.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(modifier = Modifier.padding(24.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = if (state.isPaid) stringResource(R.string.paid) else stringResource(
-                                        R.string.not_yet_paid
-                                    ),
-                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text(
-                                        stringResource(R.string.once_per_year),
-                                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(
-                                            alpha = 0.8f
-                                        ),
-                                        fontSize = 12.sp
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Icon(
-                                        Icons.Default.Info,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Button(
-                                    onClick = { onEvent(SilverEvent.TogglePaidStatus) },
-                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-                                    shape = RoundedCornerShape(24.dp),
-                                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
-                                ) {
-                                    Icon(
-                                        Icons.Default.CheckCircle,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(stringResource(R.string.mark_as_done))
-                                }
-                            }
-                        }
-                    }
+                    CommonPaidStatusCard(
+                        isPaid = state.isPaid,
+                        onTogglePaidStatus = { onEvent(SilverEvent.TogglePaidStatus) }
+                    )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Requirements Section
                     var isRequirementsExpanded by remember { mutableStateOf(true) }
+                    val allRequirementsMet =
+                        state.requirement1 && state.requirement2 && state.requirement3
+                    val requirementsCardShape = RoundedCornerShape(16.dp)
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0f)
+                        ),
+                        shape = requirementsCardShape,
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    brush = Brush.horizontalGradient(
+                                        colors = if (allRequirementsMet) {
+                                            listOf(
+                                                MaterialTheme.colorScheme.primary,
+                                                MaterialTheme.colorScheme.primaryContainer
+                                            )
+                                        } else {
+                                            listOf(
+                                                MaterialTheme.colorScheme.surface,
+                                                MaterialTheme.colorScheme.surface
+                                            )
+                                        }
+                                    ),
+                                    shape = requirementsCardShape
+                                )
+                                .padding(16.dp)
+                        ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -190,8 +156,16 @@ fun SilverScreenContent(
                                 val requirementCount =
                                     (if (state.requirement1) 1 else 0) + (if (state.requirement2) 1 else 0) + (if (state.requirement3) 1 else 0)
                                 Text(
-                                    text = stringResource(R.string.requirements, requirementCount),
-                                    color = MaterialTheme.colorScheme.primary,
+                                    text = stringResource(
+                                        R.string.requirements,
+                                        requirementCount,
+                                        3
+                                    ),
+                                    color = if (allRequirementsMet) {
+                                        MaterialTheme.colorScheme.onSecondary
+                                    } else {
+                                        MaterialTheme.colorScheme.primary
+                                    },
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 16.sp
                                 )
@@ -208,6 +182,7 @@ fun SilverScreenContent(
                                     SilverRequirementItem(
                                         text = stringResource(R.string.silver_requirement_1),
                                         checked = state.requirement1,
+                                        useOnSecondary = allRequirementsMet,
                                         onCheckedChange = {
                                             onEvent(
                                                 SilverEvent.UpdateRequirement1(
@@ -220,6 +195,7 @@ fun SilverScreenContent(
                                     SilverRequirementItem(
                                         text = stringResource(R.string.silver_requirement_2),
                                         checked = state.requirement2,
+                                        useOnSecondary = allRequirementsMet,
                                         onCheckedChange = {
                                             onEvent(
                                                 SilverEvent.UpdateRequirement2(
@@ -232,6 +208,7 @@ fun SilverScreenContent(
                                     SilverRequirementItem(
                                         text = stringResource(R.string.silver_requirement_3),
                                         checked = state.requirement3,
+                                        useOnSecondary = allRequirementsMet,
                                         onCheckedChange = {
                                             onEvent(
                                                 SilverEvent.UpdateRequirement3(
@@ -248,83 +225,62 @@ fun SilverScreenContent(
             }
 
             // Tabs
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(32.dp))
-                    .padding(4.dp)
-            ) {
-                TabItem(
-                    text = stringResource(R.string.calculate),
-                    isSelected = state.selectedTab == SilverTab.Calculator,
-                    modifier = Modifier.weight(1f),
-                    onClick = { onEvent(SilverEvent.UpdateTab(SilverTab.Calculator)) }
-                )
-                TabItem(
-                    text = stringResource(R.string.zakat_info),
-                    isSelected = state.selectedTab == SilverTab.ZakatInfo,
-                    modifier = Modifier.weight(1f),
-                    onClick = { onEvent(SilverEvent.UpdateTab(SilverTab.ZakatInfo)) }
-                )
-            }
+            CommonZakatTabs(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                selectedTab = state.selectedTab,
+                onTabChanged = { onEvent(SilverEvent.UpdateTab(it)) }
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Content Area
             Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                if (state.selectedTab == SilverTab.Calculator) {
+                if (state.selectedTab == ZakatTab.Calculator) {
                     SilverCalculatorTabContent(state, onEvent)
                 } else {
                     SilverZakatInfoTabContent()
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
 
 @Composable
-fun SilverRequirementItem(text: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+fun SilverRequirementItem(
+    text: String,
+    checked: Boolean,
+    useOnSecondary: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Checkbox(
-            checked = checked,
-            onCheckedChange = onCheckedChange,
-            colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = text,
             modifier = Modifier.weight(1f),
             fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurface
+            color = if (useOnSecondary) {
+                MaterialTheme.colorScheme.onSecondary
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            }
         )
-    }
-}
-
-@Composable
-fun TabItem(text: String, isSelected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Surface(
-        color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
-        shape = RoundedCornerShape(32.dp),
-        modifier = modifier.clickable { onClick() }
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(vertical = 12.dp),
-            textAlign = TextAlign.Center,
-            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.outline,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+        Spacer(modifier = Modifier.width(8.dp))
+        Checkbox(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
         )
     }
 }
 
 @Composable
 fun SilverCalculatorTabContent(state: SilverState, onEvent: (SilverEvent) -> Unit) {
+    val context = LocalContext.current
+
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(24.dp),
@@ -340,7 +296,11 @@ fun SilverCalculatorTabContent(state: SilverState, onEvent: (SilverEvent) -> Uni
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.weight(1f)
                 )
-                Icon(Icons.Default.HelpOutline, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                Icon(
+                    Icons.AutoMirrored.Filled.HelpOutline,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
 
             Text(
@@ -356,7 +316,11 @@ fun SilverCalculatorTabContent(state: SilverState, onEvent: (SilverEvent) -> Uni
                     .padding(vertical = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(stringResource(R.string.nisab), fontWeight = FontWeight.Bold, modifier = Modifier.padding(end = 16.dp))
+                Text(
+                    stringResource(R.string.nisab),
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(end = 16.dp)
+                )
                 Box(
                     modifier = Modifier
                         .background(
@@ -365,13 +329,22 @@ fun SilverCalculatorTabContent(state: SilverState, onEvent: (SilverEvent) -> Uni
                         )
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 ) {
-                    Text(text = stringResource(R.string.silver_nisab_value), color = MaterialTheme.colorScheme.onPrimaryContainer, fontSize = 14.sp)
+                    Text(
+                        text = stringResource(R.string.silver_nisab_value),
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        fontSize = 14.sp
+                    )
                 }
                 Spacer(modifier = Modifier.width(16.dp))
-                Icon(Icons.Default.HelpOutline, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
+                Icon(
+                    Icons.AutoMirrored.Filled.HelpOutline,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
+                )
             }
 
-            SilverInputFieldLabel(stringResource(R.string.silver_quantity))
+            CommonInputFieldLabel(stringResource(R.string.silver_quantity))
             OutlinedTextField(
                 value = state.silverQuantity,
                 onValueChange = { onEvent(SilverEvent.UpdateSilverQuantity(it)) },
@@ -386,26 +359,32 @@ fun SilverCalculatorTabContent(state: SilverState, onEvent: (SilverEvent) -> Uni
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.silver_price), fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
+                Text(
+                    stringResource(R.string.silver_price),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    Icons.Default.Search,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
                 Spacer(modifier = Modifier.width(4.dp))
-                Text(stringResource(R.string.find_current_price), color = MaterialTheme.colorScheme.primary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    stringResource(R.string.find_current_price),
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.clickable {
+                        Utils.searchOnWeb(context, context.getString(R.string.gold_price_per_gram))
+                    }
+                )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(stringResource(R.string.set_silver_price_prompt), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Button(
-                    onClick = { },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-                    shape = RoundedCornerShape(24.dp)
-                ) {
-                    Text(stringResource(R.string.set_price))
-                }
-            }
 
             OutlinedTextField(
                 value = state.silverPrice,
@@ -428,7 +407,11 @@ fun SilverCalculatorTabContent(state: SilverState, onEvent: (SilverEvent) -> Uni
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 shape = RoundedCornerShape(28.dp)
             ) {
-                Text(stringResource(R.string.calculate), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(
+                    stringResource(R.string.calculate),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
             }
 
             // Result Area
@@ -443,26 +426,50 @@ fun SilverCalculatorTabContent(state: SilverState, onEvent: (SilverEvent) -> Uni
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Column(modifier = Modifier.padding(24.dp)) {
-                                Text(stringResource(R.string.calculation_result), fontWeight = FontWeight.Bold)
+                                Text(
+                                    stringResource(R.string.calculation_result),
+                                    fontWeight = FontWeight.Bold
+                                )
                                 Spacer(modifier = Modifier.height(8.dp))
-                                Text(stringResource(R.string.silver_zakat_options), fontSize = 14.sp, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                                Text(
+                                    stringResource(R.string.silver_zakat_options),
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
                                 Spacer(modifier = Modifier.height(16.dp))
-                                Text("${result.grams} ${stringResource(R.string.grams_of_silver)}", fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
-                                Text(stringResource(R.string.or), fontSize = 14.sp, color = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.padding(vertical = 4.dp))
-                                Text("${result.cash} ${stringResource(R.string.cash)}", fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+                                Text(
+                                    "${result.grams} ${stringResource(R.string.grams_of_silver)}",
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontSize = 18.sp
+                                )
+                                Text(
+                                    stringResource(R.string.or),
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    modifier = Modifier.padding(vertical = 4.dp)
+                                )
+                                Text(
+                                    "${result.cash} ${stringResource(R.string.cash)}",
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontSize = 18.sp
+                                )
 
                                 Spacer(modifier = Modifier.height(24.dp))
 
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Button(
-                                        onClick = { },
+                                        onClick = { onEvent(SilverEvent.ToggleSummary) },
                                         modifier = Modifier
                                             .weight(1f)
                                             .height(48.dp),
                                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                                         shape = RoundedCornerShape(24.dp)
                                     ) {
-                                        Icon(Icons.Default.Description, contentDescription = null, modifier = Modifier.size(18.dp))
+                                        Icon(
+                                            Icons.Default.Description,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(18.dp)
+                                        )
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text(stringResource(R.string.summary))
                                     }
@@ -476,12 +483,16 @@ fun SilverCalculatorTabContent(state: SilverState, onEvent: (SilverEvent) -> Uni
                                                 CircleShape
                                             )
                                     ) {
-                                        Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.reset))
+                                        Icon(
+                                            Icons.Default.Refresh,
+                                            contentDescription = stringResource(R.string.reset)
+                                        )
                                     }
                                 }
                             }
                         }
                     }
+
                     is SilverCalculationResult.BelowNisab -> {
                         Card(
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
@@ -489,7 +500,10 @@ fun SilverCalculatorTabContent(state: SilverState, onEvent: (SilverEvent) -> Uni
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Column(modifier = Modifier.padding(24.dp)) {
-                                Text(stringResource(R.string.calculation_result), fontWeight = FontWeight.Bold)
+                                Text(
+                                    stringResource(R.string.calculation_result),
+                                    fontWeight = FontWeight.Bold
+                                )
                                 Spacer(modifier = Modifier.height(16.dp))
                                 Text(
                                     text = stringResource(R.string.silver_below_nisab_message),
@@ -499,14 +513,18 @@ fun SilverCalculatorTabContent(state: SilverState, onEvent: (SilverEvent) -> Uni
                                 Spacer(modifier = Modifier.height(24.dp))
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Button(
-                                        onClick = { },
+                                        onClick = { onEvent(SilverEvent.ToggleSummary) },
                                         modifier = Modifier
                                             .weight(1f)
                                             .height(48.dp),
                                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                                         shape = RoundedCornerShape(24.dp)
                                     ) {
-                                        Icon(Icons.Default.Description, contentDescription = null, modifier = Modifier.size(18.dp))
+                                        Icon(
+                                            Icons.Default.Description,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(18.dp)
+                                        )
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text(stringResource(R.string.summary))
                                     }
@@ -520,15 +538,70 @@ fun SilverCalculatorTabContent(state: SilverState, onEvent: (SilverEvent) -> Uni
                                                 CircleShape
                                             )
                                     ) {
-                                        Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.reset))
+                                        Icon(
+                                            Icons.Default.Refresh,
+                                            contentDescription = stringResource(R.string.reset)
+                                        )
                                     }
                                 }
                             }
                         }
                     }
                 }
+
+                if (state.showSummary) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        shape = RoundedCornerShape(16.dp),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = stringResource(R.string.calculation_summary),
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontSize = 16.sp
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            SummaryRow(stringResource(R.string.silver_quantity), state.silverQuantity)
+                            SummaryRow(stringResource(R.string.silver_price), state.silverPrice)
+                            SummaryRow(stringResource(R.string.nisab), stringResource(R.string.silver_nisab_value))
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                            val resultText = when (val calc = state.calculationResult) {
+                                is SilverCalculationResult.Success -> "${calc.cash} ${stringResource(R.string.cash)}"
+                                is SilverCalculationResult.BelowNisab -> stringResource(R.string.not_required)
+                                else -> ""
+                            }
+                            SummaryRow(
+                                stringResource(R.string.total_result),
+                                resultText,
+                                isBold = true
+                            )
+                        }
+                    }
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun SummaryRow(label: String, value: String, isBold: Boolean = false) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, color = MaterialTheme.colorScheme.outline, fontSize = 14.sp)
+        Text(
+            text = value,
+            fontWeight = if (isBold) FontWeight.Bold else FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = 14.sp
+        )
     }
 }
 
@@ -550,7 +623,7 @@ fun SilverZakatInfoTabContent() {
         )
         Spacer(modifier = Modifier.height(24.dp))
 
-        SilverInfoExpandableItem(
+        CommonInfoExpandableItem(
             title = stringResource(R.string.do_i_have_to_pay),
             content = stringResource(R.string.silver_do_i_have_to_pay_content),
             isExpanded = expandedItem == 0,
@@ -559,55 +632,13 @@ fun SilverZakatInfoTabContent() {
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        SilverInfoExpandableItem(
+        CommonInfoExpandableItem(
             title = stringResource(R.string.how_to_pay),
             content = stringResource(R.string.silver_how_to_pay_content),
             isExpanded = expandedItem == 1,
             onToggle = { expandedItem = if (expandedItem == 1) null else 1 }
         )
     }
-}
-
-@Composable
-fun SilverInfoExpandableItem(title: String, content: String, isExpanded: Boolean, onToggle: () -> Unit) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = if (isExpanded) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(16.dp),
-        border = if (!isExpanded) BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant) else null,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onToggle() }
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Icon(
-                    if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = null
-                )
-            }
-
-            AnimatedVisibility(visible = isExpanded) {
-                Text(
-                    text = content,
-                    modifier = Modifier.padding(top = 16.dp),
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun SilverInputFieldLabel(text: String) {
-    Text(text = text, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
 }
 
 @Preview(showBackground = true)

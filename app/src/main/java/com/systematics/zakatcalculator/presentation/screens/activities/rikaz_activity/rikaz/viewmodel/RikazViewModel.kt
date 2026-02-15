@@ -15,12 +15,22 @@ class RikazViewModel : ViewModel() {
     fun onEvent(event: RikazEvent) {
         when (event) {
             is RikazEvent.UpdateTreasureValue -> _state.update { it.copy(treasureValue = event.value) }
+            is RikazEvent.UpdateRequirement1 -> _state.update { it.copy(requirement1 = event.value) }
             is RikazEvent.UpdateTab -> _state.update { it.copy(selectedTab = event.tab) }
             RikazEvent.TogglePaidStatus -> _state.update { it.copy(isPaid = !it.isPaid) }
+            RikazEvent.ToggleSummary -> _state.update { it.copy(showSummary = !it.showSummary) }
+            RikazEvent.ResetCalculation -> _state.update {
+                it.copy(zakatAmount = null, showSummary = false)
+            }
             RikazEvent.CalculateZakat -> {
                 val treasureValue = _state.value.treasureValue.toDoubleOrNull() ?: 0.0
                 val zakatAmount = treasureValue * 0.20
-                _state.update { it.copy(zakatAmount = zakatAmount.toString()) }
+                _state.update {
+                    it.copy(
+                        zakatAmount = String.format("%,.0f", zakatAmount),
+                        showSummary = false
+                    )
+                }
             }
         }
     }

@@ -1,12 +1,12 @@
 package com.systematics.zakatcalculator.presentation.screens.activities.fitrah_activity.fitrah.events
 
-import com.systematics.zakatcalculator.presentation.screens.activities.fitrah_activity.fitrah.state.FitrahTab
+import com.systematics.zakatcalculator.presentation.screens.models.ZakatTab
 
 sealed class FitrahEvent {
     object TogglePaidStatus : FitrahEvent()
     data class UpdateCanGiveRice(val value: Boolean) : FitrahEvent()
     data class UpdateHasExcessFood(val value: Boolean) : FitrahEvent()
-    data class UpdateTab(val tab: FitrahTab) : FitrahEvent()
+    data class UpdateTab(val tab: ZakatTab) : FitrahEvent()
     object IncrementPeople : FitrahEvent()
     object DecrementPeople : FitrahEvent()
     data class UpdatePayWith(val value: String) : FitrahEvent()

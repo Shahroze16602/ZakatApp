@@ -11,7 +11,7 @@ val GradientYellow = Color(0xFFF0D264)
 val CardGradientStart = Color(0xFF1B5E20)
 val CardGradientEnd = Color(0xFF81C784)
 
-val GoldColor = Color(0xFFFFD700)
+val GoldColor = Color(0xFFD4AF37)
 val VerseBackground = Color(0xFFFFF9C4)
 val VerseText = Color(0xFF004D40)
 

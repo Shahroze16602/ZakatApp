@@ -39,8 +39,11 @@ class SilverViewModel : ViewModel() {
             is SilverEvent.Calculate -> {
                 calculateZakat()
             }
+            is SilverEvent.ToggleSummary -> {
+                _state.update { it.copy(showSummary = !it.showSummary) }
+            }
             is SilverEvent.ResetCalculation -> {
-                _state.update { it.copy(calculationResult = null) }
+                _state.update { it.copy(calculationResult = null, showSummary = false) }
             }
         }
     }
@@ -60,11 +63,17 @@ class SilverViewModel : ViewModel() {
                     calculationResult = SilverCalculationResult.Success(
                         grams = String.format("%.2f", zakatGrams),
                         cash = String.format("%,.0f", zakatCash)
-                    )
+                    ),
+                    showSummary = false
                 )
             }
         } else {
-            _state.update { it.copy(calculationResult = SilverCalculationResult.BelowNisab) }
+            _state.update {
+                it.copy(
+                    calculationResult = SilverCalculationResult.BelowNisab,
+                    showSummary = false
+                )
+            }
         }
     }
 }

@@ -1,8 +1,9 @@
 package com.systematics.zakatcalculator.presentation.screens.activities.rikaz_activity.rikaz.content
 
 import android.app.Activity
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,23 +16,28 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronLeft
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,17 +46,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.systematics.zakatcalculator.presentation.screens.activities.fitrah_activity.fitrah.state.FitrahTab
+import com.systematics.zakatcalculator.R
 import com.systematics.zakatcalculator.presentation.screens.activities.rikaz_activity.rikaz.events.RikazEvent
 import com.systematics.zakatcalculator.presentation.screens.activities.rikaz_activity.rikaz.state.RikazState
+import com.systematics.zakatcalculator.presentation.screens.components.CommonAppBar
+import com.systematics.zakatcalculator.presentation.screens.components.CommonInfoBox
+import com.systematics.zakatcalculator.presentation.screens.components.CommonInfoExpandableItem
+import com.systematics.zakatcalculator.presentation.screens.components.CommonPaidStatusCard
+import com.systematics.zakatcalculator.presentation.screens.components.CommonZakatTabs
+import com.systematics.zakatcalculator.presentation.screens.models.ZakatTab
 
 @Composable
 fun RikazScreenContent(
@@ -59,165 +71,167 @@ fun RikazScreenContent(
 ) {
     val context = LocalContext.current
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(rememberScrollState())
-    ) {
-        // Custom Header
-        Box(
+    Scaffold(
+        topBar = {
+            CommonAppBar(
+                title = stringResource(R.string.cat_rikaz),
+                onBackClick = { (context as? Activity)?.finish() }
+            )
+        }
+    ) { paddingValues ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.primaryContainer
-                        )
-                    ),
-                    shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
-                )
-                .padding(top = 48.dp, bottom = 24.dp, start = 16.dp, end = 16.dp)
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .verticalScroll(rememberScrollState())
+                .padding(paddingValues)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = { (context as? Activity)?.finish() }) {
-                    Icon(
-                        Icons.Default.ChevronLeft,
-                        contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
-                Text(
-                    text = "Rikaz",
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
+            Column(modifier = Modifier.padding(16.dp).padding(bottom = 24.dp)) {
+                CommonInfoBox(text = stringResource(R.string.rikaz_zakat_description))
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                CommonPaidStatusCard(
+                    isPaid = state.isPaid,
+                    onTogglePaidStatus = { onEvent(RikazEvent.TogglePaidStatus) }
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                var isRequirementsExpanded by remember { mutableStateOf(true) }
+                RikazRequirementsSection(
+                    requirement1 = state.requirement1,
+                    isRequirementsExpanded = isRequirementsExpanded,
+                    onRequirementsExpandedChange = { isRequirementsExpanded = it },
+                    onRequirement1Changed = { onEvent(RikazEvent.UpdateRequirement1(it)) }
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                CommonZakatTabs(
+                    selectedTab = state.selectedTab,
+                    onTabChanged = { onEvent(RikazEvent.UpdateTab(it)) }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (state.selectedTab == ZakatTab.Calculator) {
+                    RikazCalculatorSection(state = state, onEvent = onEvent)
+                } else {
+                    RikazInfoSection()
+                }
             }
         }
+    }
+}
 
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            // Info Box
-            Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
-                shape = RoundedCornerShape(16.dp),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Zakat on treasure is the requirement to give 20% of any hidden treasures or minerals found in one’s land in charity.",
-                    modifier = Modifier.padding(16.dp),
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer
+@Composable
+private fun RikazRequirementsSection(
+    requirement1: Boolean,
+    isRequirementsExpanded: Boolean,
+    onRequirementsExpandedChange: (Boolean) -> Unit,
+    onRequirement1Changed: (Boolean) -> Unit
+) {
+    val allRequirementsMet = requirement1
+    val requirementsCardShape = RoundedCornerShape(16.dp)
+
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0f)),
+        shape = requirementsCardShape,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        val requirementsBrush = Brush.horizontalGradient(
+            colors = if (allRequirementsMet) {
+                listOf(
+                    MaterialTheme.colorScheme.primary,
+                    MaterialTheme.colorScheme.primaryContainer
+                )
+            } else {
+                listOf(
+                    MaterialTheme.colorScheme.surface,
+                    MaterialTheme.colorScheme.surface
+                )
+            }
+        )
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Canvas(modifier = Modifier.matchParentSize()) {
+                drawRoundRect(
+                    brush = requirementsBrush,
+                    cornerRadius = CornerRadius(
+                        requirementsCardShape.topStart.toPx(size, this),
+                        requirementsCardShape.topStart.toPx(size, this)
+                    )
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Paid Status Row
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                modifier = Modifier.fillMaxWidth()
-
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = if (state.isPaid) "Paid!" else "Not yet paid!",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-
-                        Text(
-                            text = "when you find treasure",
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Button(
-                        onClick = { onEvent(RikazEvent.TogglePaidStatus) },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        )
-                    ) {
-                        Text(text = "I've paid the zakat")
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Tabs
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(32.dp))
-                    .padding(4.dp)
+                    .clickable { onRequirementsExpandedChange(!isRequirementsExpanded) },
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                TabItem(
-                    text = "Calculator",
-                    isSelected = state.selectedTab == FitrahTab.Calculator,
-                    modifier = Modifier.weight(1f),
-                    onClick = { onEvent(RikazEvent.UpdateTab(FitrahTab.Calculator)) }
+                Text(
+                    text = stringResource(R.string.requirements, if (requirement1) 1 else 0, 1),
+                    color = if (allRequirementsMet) {
+                        MaterialTheme.colorScheme.onSecondary
+                    } else {
+                        MaterialTheme.colorScheme.primary
+                    },
+                    fontWeight = FontWeight.Bold
                 )
-                TabItem(
-                    text = "Zakat Info",
-                    isSelected = state.selectedTab == FitrahTab.ZakatInfo,
-                    modifier = Modifier.weight(1f),
-                    onClick = { onEvent(RikazEvent.UpdateTab(FitrahTab.ZakatInfo)) }
+                Icon(
+                    imageVector = if (isRequirementsExpanded) {
+                        Icons.Default.KeyboardArrowUp
+                    } else {
+                        Icons.Default.KeyboardArrowDown
+                    },
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            AnimatedVisibility(visible = isRequirementsExpanded) {
+                Column {
+                    Spacer(modifier = Modifier.height(12.dp))
 
-            // Calculator Content
-            if (state.selectedTab == FitrahTab.Calculator) {
-                CalculatorSection(state, onEvent)
-            } else {
-                InfoSection()
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onRequirement1Changed(!requirement1) },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.rikaz_requirement_1),
+                            modifier = Modifier.weight(1f),
+                            color = if (allRequirementsMet) {
+                                MaterialTheme.colorScheme.onSecondary
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            }
+                        )
+                        Checkbox(
+                            checked = requirement1,
+                            onCheckedChange = onRequirement1Changed,
+                            colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
+                        )
+                    }
+                }
             }
+        }
         }
     }
 }
 
 @Composable
-fun TabItem(text: String, isSelected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Surface(
-        color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
-        shape = RoundedCornerShape(32.dp),
-        modifier = modifier.clickable { onClick() }
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(vertical = 12.dp),
-            textAlign = TextAlign.Center,
-            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.outline,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-        )
-    }
-}
-
-@Composable
-fun CalculatorSection(state: RikazState, onEvent: (RikazEvent) -> Unit) {
+private fun RikazCalculatorSection(state: RikazState, onEvent: (RikazEvent) -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(16.dp),
@@ -227,7 +241,7 @@ fun CalculatorSection(state: RikazState, onEvent: (RikazEvent) -> Unit) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "Calculate Zakat Rikaz",
+                    text = stringResource(R.string.calculate_zakat_rikaz),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
@@ -242,15 +256,18 @@ fun CalculatorSection(state: RikazState, onEvent: (RikazEvent) -> Unit) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(text = "If you have meet the requirements, please calculate below:", color = MaterialTheme.colorScheme.onSurface)
+            Text(
+                text = stringResource(R.string.rikaz_calculation_prompt),
+                color = MaterialTheme.colorScheme.onSurface
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = state.treasureValue,
                 onValueChange = { onEvent(RikazEvent.UpdateTreasureValue(it)) },
-                label = { Text("Value of treasure") },
-                placeholder = { Text("Amount") },
+                label = { Text(stringResource(R.string.value_of_treasure)) },
+                placeholder = { Text(stringResource(R.string.amount)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -262,83 +279,137 @@ fun CalculatorSection(state: RikazState, onEvent: (RikazEvent) -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text(text = "Calculate")
+                Text(text = stringResource(R.string.calculate))
+            }
+
+            state.zakatAmount?.let { amount ->
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                    shape = RoundedCornerShape(24.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(24.dp)) {
+                        Text(
+                            text = stringResource(R.string.calculation_result),
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Text(
+                            text = amount,
+                            fontSize = 30.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Text(
+                            text = stringResource(R.string.cash),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Button(
+                                onClick = { onEvent(RikazEvent.ToggleSummary) },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                            ) {
+                                Icon(Icons.Default.Description, contentDescription = null)
+                                Spacer(modifier = Modifier.size(8.dp))
+                                Text(stringResource(R.string.summary))
+                            }
+
+                            IconButton(
+                                onClick = { onEvent(RikazEvent.ResetCalculation) },
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .background(MaterialTheme.colorScheme.surface, CircleShape)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = stringResource(R.string.reset)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                if (state.showSummary) {
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = stringResource(R.string.calculation_summary),
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontSize = 16.sp
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            SummaryRow(stringResource(R.string.value_of_treasure), state.treasureValue)
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                            SummaryRow(
+                                stringResource(R.string.total_result),
+                                amount,
+                                isBold = true
+                            )
+                        }
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-fun InfoSection() {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "About Zakat Rikaz",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "Zakat on treasure is the requirement to give 20% of any hidden treasures or minerals found in one’s land in charity. This includes treasures found in mines, such as gold and silver mines, and precious metals.\n\nRikaz refers to anything hidden in the ground, and if a Muslim finds any buried treasures, especially those that have been hidden for a long time, they must pay one-fifth of it as zakat immediately.",
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            InfoItem(
-                question = "Do I have to pay?",
-                answer = "According to Islamic law, if someone finds treasure such as gold or silver that has been buried or hidden in the ground, he is obliged to pay zakat on that treasure."
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            InfoItem(
-                question = "How to pay?",
-                answer = "You can pay Zakat online by transferring funds to the official account of the zakat management institution."
-            )
-        }
-    }
-}
-
-@Composable
-fun InfoItem(question: String, answer: String) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Card(
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+private fun SummaryRow(label: String, value: String, isBold: Boolean = false) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { expanded = !expanded }
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = question,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-                Icon(
-                    if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-            }
-            if (expanded) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = answer, color = MaterialTheme.colorScheme.onSecondaryContainer)
-            }
-        }
+        Text(text = label, color = MaterialTheme.colorScheme.outline, fontSize = 14.sp)
+        Text(
+            text = value,
+            fontWeight = if (isBold) FontWeight.Bold else FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = 14.sp
+        )
+    }
+}
+
+@Composable
+private fun RikazInfoSection() {
+    var expandedItem by remember { mutableStateOf<Int?>(null) }
+
+    Column {
+        CommonInfoExpandableItem(
+            title = stringResource(R.string.do_i_have_to_pay),
+            content = stringResource(R.string.rikaz_do_i_have_to_pay_content),
+            isExpanded = expandedItem == 0,
+            onToggle = { expandedItem = if (expandedItem == 0) null else 0 }
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        CommonInfoExpandableItem(
+            title = stringResource(R.string.how_to_pay),
+            content = stringResource(R.string.rikaz_how_to_pay_content),
+            isExpanded = expandedItem == 1,
+            onToggle = { expandedItem = if (expandedItem == 1) null else 1 }
+        )
     }
 }

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,7 +37,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -47,9 +47,10 @@ import com.systematics.zakatcalculator.BuildConfig
 import com.systematics.zakatcalculator.R
 import com.systematics.zakatcalculator.ui.theme.ZakatCalculatorTheme
 import androidx.core.net.toUri
+import com.systematics.zakatcalculator.presentation.screens.components.CommonAppBar
 
 @Composable
-fun SettingsScreenContent() {
+fun SettingsScreenContent(onBackClick: () -> Unit = {}) {
     val context = LocalContext.current
 
     Column(
@@ -59,47 +60,12 @@ fun SettingsScreenContent() {
             .verticalScroll(rememberScrollState())
             .padding(bottom = 24.dp)
     ) {
-        SettingsHeader()
+        CommonAppBar(
+            title = stringResource(R.string.settings),
+            onBackClick = onBackClick
+        )
         Spacer(modifier = Modifier.height(24.dp))
         SettingsList(context)
-    }
-}
-
-@Composable
-fun SettingsHeader() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                brush = Brush.horizontalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primary,
-                        MaterialTheme.colorScheme.primaryContainer
-                    )
-                ),
-                shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
-            )
-            .padding(top = 24.dp, bottom = 24.dp, start = 16.dp, end = 16.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            IconButton(onClick = { /* Handle back */ }) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBackIosNew,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = stringResource(R.string.settings),
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onPrimary,
-                fontWeight = FontWeight.Bold
-            )
-        }
     }
 }
 
@@ -152,7 +118,7 @@ fun SettingsItemCard(item: SettingsItemData) {
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = Color.DarkGray
+                color = MaterialTheme.colorScheme.onSurface
             )
             if (item.value != null) {
                 Text(
@@ -173,22 +139,25 @@ fun SettingsItemCard(item: SettingsItemData) {
 }
 
 private fun rateUs(context: Context) {
-    val intent = Intent(Intent.ACTION_VIEW, "market://details?id=${context.packageName}".toUri())
+    val intent = Intent(
+        Intent.ACTION_VIEW,
+        context.getString(R.string.rate_us_market_url, context.packageName).toUri()
+    )
     context.startActivity(intent)
 }
 
 private fun shareApp(context: Context) {
     val sendIntent: Intent = Intent().apply {
         action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_TEXT, "Check out this Zakat Calculator app: [App Link]")
-        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, context.getString(R.string.share_app_text))
+        type = context.getString(R.string.mime_text_plain)
     }
     val shareIntent = Intent.createChooser(sendIntent, null)
     context.startActivity(shareIntent)
 }
 
 private fun openPrivacyPolicy(context: Context) {
-    val intent = Intent(Intent.ACTION_VIEW, "https://www.example.com".toUri())
+    val intent = Intent(Intent.ACTION_VIEW, context.getString(R.string.privacy_policy_url).toUri())
     context.startActivity(intent)
 }
 

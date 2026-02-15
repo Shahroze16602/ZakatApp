@@ -1,20 +1,45 @@
 package com.systematics.zakatcalculator.presentation.screens.activities.savings_activity.savings.content
 
 import android.app.Activity
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.Canvas
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronLeft
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,17 +47,27 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.systematics.zakatcalculator.presentation.screens.activities.fitrah_activity.fitrah.state.FitrahTab
+import com.systematics.zakatcalculator.R
 import com.systematics.zakatcalculator.presentation.screens.activities.savings_activity.savings.events.SavingsEvent
+import com.systematics.zakatcalculator.presentation.screens.activities.savings_activity.savings.state.SavingsCalculationResult
 import com.systematics.zakatcalculator.presentation.screens.activities.savings_activity.savings.state.SavingsState
+import com.systematics.zakatcalculator.presentation.screens.components.CommonAppBar
+import com.systematics.zakatcalculator.presentation.screens.components.CommonInfoBox
+import com.systematics.zakatcalculator.presentation.screens.components.CommonInfoExpandableItem
+import com.systematics.zakatcalculator.presentation.screens.components.CommonPaidStatusCard
+import com.systematics.zakatcalculator.presentation.screens.components.CommonZakatTabs
+import com.systematics.zakatcalculator.presentation.screens.models.ZakatTab
+import com.systematics.zakatcalculator.utils.Utils
 
 @Composable
 fun SavingsScreenContent(
@@ -41,197 +76,169 @@ fun SavingsScreenContent(
 ) {
     val context = LocalContext.current
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(rememberScrollState())
-    ) {
-        // Custom Header
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.primaryContainer
-                        )
-                    ),
-                    shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
-                )
-                .padding(top = 48.dp, bottom = 24.dp, start = 16.dp, end = 16.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = { (context as? Activity)?.finish() }) {
-                    Icon(
-                        Icons.Default.ChevronLeft,
-                        contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
-                Text(
-                    text = "Savings",
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+    Scaffold(
+        topBar = {
+            CommonAppBar(
+                title = stringResource(R.string.cat_savings),
+                onBackClick = { (context as? Activity)?.finish() }
+            )
         }
-
+    ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .verticalScroll(rememberScrollState())
+                .padding(paddingValues)
         ) {
-            // Info Box
-            Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
-                shape = RoundedCornerShape(16.dp),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Zakat is imposed on the total amount of savings kept in various types of accounts at banks or financial institutions.",
-                    modifier = Modifier.padding(16.dp),
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer
+            Column(modifier = Modifier.padding(16.dp).padding(bottom = 24.dp)) {
+                CommonInfoBox(text = stringResource(R.string.savings_zakat_description))
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                CommonPaidStatusCard(
+                    isPaid = state.isPaid,
+                    onTogglePaidStatus = { onEvent(SavingsEvent.TogglePaidStatus) }
                 )
-            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            // Paid Status Row
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                modifier = Modifier.fillMaxWidth()
+                RequirementsSection(state = state, onEvent = onEvent)
 
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = if (state.isPaid) "Paid!" else "Not yet paid!",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
+                Spacer(modifier = Modifier.height(24.dp))
 
-                        Text(
-                            text = "once per year",
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                    }
+                CommonZakatTabs(
+                    selectedTab = state.selectedTab,
+                    onTabChanged = { onEvent(SavingsEvent.UpdateTab(it)) }
+                )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    Button(
-                        onClick = { onEvent(SavingsEvent.TogglePaidStatus) },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        )
-                    ) {
-                        Text(text = "Mark as done")
-                    }
+                if (state.selectedTab == ZakatTab.Calculator) {
+                    SavingsCalculatorSection(state = state, onEvent = onEvent)
+                } else {
+                    SavingsInfoSection()
                 }
-            }
-
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Requirements Section
-            Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Requirements (0/3)",
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    RequirementItem(
-                        text = "I have savings kept in one or more types of accounts at banks or financial institutions.",
-                        checked = state.requirement1,
-                        onCheckedChange = { onEvent(SavingsEvent.UpdateRequirement1(it)) }
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    RequirementItem(
-                        text = "The amount is at least the price of 85 grams of gold (3,825,000).",
-                        checked = state.requirement2,
-                        onCheckedChange = { onEvent(SavingsEvent.UpdateRequirement2(it)) }
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    RequirementItem(
-                        text = "I've kept it for at least one Islamic lunar year (hawl).",
-                        checked = state.requirement3,
-                        onCheckedChange = { onEvent(SavingsEvent.UpdateRequirement3(it)) }
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Tabs
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(32.dp))
-                    .padding(4.dp)
-            ) {
-                TabItem(
-                    text = "Calculator",
-                    isSelected = state.selectedTab == FitrahTab.Calculator,
-                    modifier = Modifier.weight(1f),
-                    onClick = { onEvent(SavingsEvent.UpdateTab(FitrahTab.Calculator)) }
-                )
-                TabItem(
-                    text = "Zakat Info",
-                    isSelected = state.selectedTab == FitrahTab.ZakatInfo,
-                    modifier = Modifier.weight(1f),
-                    onClick = { onEvent(SavingsEvent.UpdateTab(FitrahTab.ZakatInfo)) }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Calculator Content
-            if (state.selectedTab == FitrahTab.Calculator) {
-                CalculatorSection(state, onEvent)
-            } else {
-                InfoSection()
             }
         }
     }
 }
 
 @Composable
-fun RequirementItem(text: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+private fun RequirementsSection(state: SavingsState, onEvent: (SavingsEvent) -> Unit) {
+    var isRequirementsExpanded by remember { mutableStateOf(true) }
+    val allRequirementsMet = state.requirement1 && state.requirement2 && state.requirement3
+    val requirementsCardShape = RoundedCornerShape(16.dp)
+    val requirementsBrush = Brush.horizontalGradient(
+        colors = if (allRequirementsMet) {
+            listOf(
+                MaterialTheme.colorScheme.primary,
+                MaterialTheme.colorScheme.primaryContainer
+            )
+        } else {
+            listOf(
+                MaterialTheme.colorScheme.surface,
+                MaterialTheme.colorScheme.surface
+            )
+        }
+    )
+
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0f)),
+        shape = requirementsCardShape,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Canvas(modifier = Modifier.matchParentSize()) {
+                drawRoundRect(
+                    brush = requirementsBrush,
+                    cornerRadius = CornerRadius(
+                        requirementsCardShape.topStart.toPx(size, this),
+                        requirementsCardShape.topStart.toPx(size, this)
+                    )
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { isRequirementsExpanded = !isRequirementsExpanded },
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(
+                        R.string.requirements,
+                        listOf(state.requirement1, state.requirement2, state.requirement3).count { it },
+                        3
+                    ),
+                    color = if (allRequirementsMet) {
+                        MaterialTheme.colorScheme.onSecondary
+                    } else {
+                        MaterialTheme.colorScheme.primary
+                    },
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+                Icon(
+                    imageVector = if (isRequirementsExpanded) {
+                        Icons.Default.KeyboardArrowUp
+                    } else {
+                        Icons.Default.KeyboardArrowDown
+                    },
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            AnimatedVisibility(visible = isRequirementsExpanded) {
+                Column {
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    RequirementItem(
+                        text = stringResource(R.string.savings_requirement_1),
+                        checked = state.requirement1,
+                        useOnSecondary = allRequirementsMet,
+                        onCheckedChange = { onEvent(SavingsEvent.UpdateRequirement1(it)) }
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    RequirementItem(
+                        text = stringResource(R.string.savings_requirement_2),
+                        checked = state.requirement2,
+                        useOnSecondary = allRequirementsMet,
+                        onCheckedChange = { onEvent(SavingsEvent.UpdateRequirement2(it)) }
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    RequirementItem(
+                        text = stringResource(R.string.savings_requirement_3),
+                        checked = state.requirement3,
+                        useOnSecondary = allRequirementsMet,
+                        onCheckedChange = { onEvent(SavingsEvent.UpdateRequirement3(it)) }
+                    )
+                }
+            }
+        }
+        }
+    }
+}
+
+@Composable
+private fun RequirementItem(
+    text: String,
+    checked: Boolean,
+    useOnSecondary: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -239,40 +246,29 @@ fun RequirementItem(text: String, checked: Boolean, onCheckedChange: (Boolean) -
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Text(
+            text = text,
+            modifier = Modifier.weight(1f),
+            fontSize = 14.sp,
+            color = if (useOnSecondary) {
+                MaterialTheme.colorScheme.onSecondary
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            }
+        )
+        Spacer(modifier = Modifier.width(8.dp))
         Checkbox(
             checked = checked,
             onCheckedChange = onCheckedChange,
             colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
         )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = text,
-            modifier = Modifier.weight(1f),
-            fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurface
-        )
     }
 }
 
 @Composable
-fun TabItem(text: String, isSelected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Surface(
-        color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
-        shape = RoundedCornerShape(32.dp),
-        modifier = modifier.clickable { onClick() }
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(vertical = 12.dp),
-            textAlign = TextAlign.Center,
-            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.outline,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-        )
-    }
-}
+private fun SavingsCalculatorSection(state: SavingsState, onEvent: (SavingsEvent) -> Unit) {
+    val context = LocalContext.current
 
-@Composable
-fun CalculatorSection(state: SavingsState, onEvent: (SavingsEvent) -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(16.dp),
@@ -282,7 +278,7 @@ fun CalculatorSection(state: SavingsState, onEvent: (SavingsEvent) -> Unit) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "Calculate Zakat Savings",
+                    text = stringResource(R.string.calculate_zakat_savings),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
@@ -297,14 +293,17 @@ fun CalculatorSection(state: SavingsState, onEvent: (SavingsEvent) -> Unit) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(text = "If you meet the requirements, please calculate below:", color = MaterialTheme.colorScheme.onSurface)
+            Text(
+                text = stringResource(R.string.savings_calculation_prompt),
+                color = MaterialTheme.colorScheme.onSurface
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = state.savings,
                 onValueChange = { onEvent(SavingsEvent.UpdateSavings(it)) },
-                label = { Text("Savings") },
+                label = { Text(stringResource(R.string.savings_label)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -314,114 +313,214 @@ fun CalculatorSection(state: SavingsState, onEvent: (SavingsEvent) -> Unit) {
             OutlinedTextField(
                 value = state.interests,
                 onValueChange = { onEvent(SavingsEvent.UpdateInterests(it)) },
-                label = { Text("Interests") },
-                placeholder = { Text("If saving in a conventional bank")},
+                label = { Text(stringResource(R.string.interests_label)) },
+                placeholder = { Text(stringResource(R.string.interests_placeholder)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text("Gold price:", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-
             Row(verticalAlignment = Alignment.CenterVertically) {
-                OutlinedTextField(
-                    value = state.goldPrice,
-                    onValueChange = { onEvent(SavingsEvent.UpdateGoldPrice(it)) },
-                    label = { Text("Current gold price per gram") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                Text(
+                    stringResource(R.string.gold_price),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.weight(1f)
                 )
-            }
-            TextButton(onClick = { /*TODO*/ }) {
-                Text(text = "Find current price")
+                Icon(
+                    Icons.Default.Search,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    stringResource(R.string.find_current_price),
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.clickable {
+                        Utils.searchOnWeb(context, context.getString(R.string.gold_price_per_gram))
+                    }
+                )
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = state.goldPrice,
+                onValueChange = { onEvent(SavingsEvent.UpdateGoldPrice(it)) },
+                label = { Text(stringResource(R.string.current_gold_price_per_gram)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { /*TODO*/ },
+                onClick = { onEvent(SavingsEvent.Calculate) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text(text = "Calculate")
+                Text(text = stringResource(R.string.calculate))
+            }
+
+            state.calculationResult?.let { result ->
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                    shape = RoundedCornerShape(24.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(24.dp)) {
+                        Text(
+                            text = stringResource(R.string.calculation_result),
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        when (result) {
+                            is SavingsCalculationResult.Success -> {
+                                Text(
+                                    text = result.amount,
+                                    fontSize = 30.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                                Text(
+                                    text = stringResource(R.string.cash),
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
+
+                            SavingsCalculationResult.BelowNisab -> {
+                                Text(
+                                    text = stringResource(R.string.savings_below_nisab_message),
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Button(
+                                onClick = { onEvent(SavingsEvent.ToggleSummary) },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                            ) {
+                                Icon(Icons.Default.Description, contentDescription = null)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(stringResource(R.string.summary))
+                            }
+
+                            IconButton(
+                                onClick = { onEvent(SavingsEvent.ResetCalculation) },
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .background(MaterialTheme.colorScheme.surface, CircleShape)
+                            ) {
+                                Icon(
+                                    Icons.Default.Refresh,
+                                    contentDescription = stringResource(R.string.reset)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                if (state.showSummary) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = stringResource(R.string.calculation_summary),
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontSize = 16.sp
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            SummaryRow(stringResource(R.string.savings_label), state.savings)
+                            SummaryRow(stringResource(R.string.interests_label), state.interests)
+                            SummaryRow(stringResource(R.string.gold_price), state.goldPrice)
+
+                            val netSavings = ((state.savings.toDoubleOrNull() ?: 0.0) - (state.interests.toDoubleOrNull()
+                                ?: 0.0)).coerceAtLeast(0.0)
+                            val nisab = (state.goldPrice.toDoubleOrNull() ?: 0.0) * 85.0
+
+                            SummaryRow(
+                                stringResource(R.string.net_savings),
+                                String.format("%,.0f", netSavings)
+                            )
+                            SummaryRow(
+                                stringResource(R.string.nisab_threshold),
+                                String.format("%,.0f", nisab)
+                            )
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                            SummaryRow(
+                                stringResource(R.string.total_result),
+                                if (result is SavingsCalculationResult.Success) result.amount else stringResource(
+                                    R.string.not_required
+                                ),
+                                isBold = true
+                            )
+                        }
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-fun InfoSection() {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "About Zakat Savings",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "Zakat is imposed on the total amount of savings kept in various types of accounts at banks or financial institutions.",
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            InfoItem(
-                question = "Do I have to pay?",
-                answer = "Yes, as soon as your wealth exceeds the threshold, known as the nisab, and one lunar year (hawl) has passed. The nisab is different for different types of wealth, but is generally equal to the value of 85 grams of gold in the currency used to pay zakat."
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            InfoItem(
-                question = "How to pay?",
-                answer = "You can pay Zakat online by transferring funds to the official account of the zakat management institution."
-            )
-        }
-    }
-}
-
-@Composable
-fun InfoItem(question: String, answer: String) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Card(
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+private fun SummaryRow(label: String, value: String, isBold: Boolean = false) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { expanded = !expanded }
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = question,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-                Icon(
-                    if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-            }
-            if (expanded) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = answer, color = MaterialTheme.colorScheme.onSecondaryContainer)
-            }
-        }
+        Text(text = label, color = MaterialTheme.colorScheme.outline, fontSize = 14.sp)
+        Text(
+            text = value,
+            fontWeight = if (isBold) FontWeight.Bold else FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = 14.sp
+        )
+    }
+}
+
+@Composable
+private fun SavingsInfoSection() {
+    var expandedItem by remember { mutableStateOf<Int?>(null) }
+
+    Column {
+        CommonInfoExpandableItem(
+            title = stringResource(R.string.do_i_have_to_pay),
+            content = stringResource(R.string.savings_do_i_have_to_pay_content),
+            isExpanded = expandedItem == 0,
+            onToggle = { expandedItem = if (expandedItem == 0) null else 0 }
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        CommonInfoExpandableItem(
+            title = stringResource(R.string.how_to_pay),
+            content = stringResource(R.string.savings_how_to_pay_content),
+            isExpanded = expandedItem == 1,
+            onToggle = { expandedItem = if (expandedItem == 1) null else 1 }
+        )
     }
 }
