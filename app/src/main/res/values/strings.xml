@@ -90,6 +90,7 @@
     <string name="gold_quantity_placeholder">Gold quantity</string>
     <string name="gold_price">Gold price:</string>
     <string name="gold_price_per_gram">gold price per gram</string>
+    <string name="silver_price_per_gram">silver price per gram</string>
     <string name="set_gold_price_prompt">Set gold price to see if you\'re qualified.</string>
     <string name="gold_price_placeholder">Gold price</string>
     <string name="gold_zakat_options">You have few options for your Zakat Gold:</string>

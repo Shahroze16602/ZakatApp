@@ -25,8 +25,10 @@ import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Policy
+import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.RateReview
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.StarRate
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -72,9 +74,9 @@ fun SettingsScreenContent(onBackClick: () -> Unit = {}) {
 @Composable
 fun SettingsList(context: Context) {
     val items = listOf(
-        SettingsItemData(stringResource(R.string.rate_us), Icons.Default.RateReview) { rateUs(context) },
+        SettingsItemData(stringResource(R.string.rate_us), Icons.Default.StarRate) { rateUs(context) },
         SettingsItemData(stringResource(R.string.share_app), Icons.Default.Share) { shareApp(context) },
-        SettingsItemData(stringResource(R.string.privacy_policy), Icons.Default.Policy) { openPrivacyPolicy(context) },
+        SettingsItemData(stringResource(R.string.privacy_policy), Icons.Default.PrivacyTip) { openPrivacyPolicy(context) },
         SettingsItemData(stringResource(R.string.app_version), Icons.Default.Info, BuildConfig.VERSION_NAME)
     )
 

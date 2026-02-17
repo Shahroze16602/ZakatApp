@@ -55,9 +55,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -108,7 +110,7 @@ fun HomeScreenContent() {
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = MaterialTheme.colorScheme.primary,
                         selectedTextColor = MaterialTheme.colorScheme.primary,
-                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                        indicatorColor = MaterialTheme.colorScheme.onPrimary
                     )
                 )
                 NavigationBarItem(
@@ -122,9 +124,10 @@ fun HomeScreenContent() {
                     selected = pagerState.currentPage == 1,
                     onClick = { scope.launch { pagerState.animateScrollToPage(1) } },
                     colors = NavigationBarItemDefaults.colors(
+
                         selectedIconColor = MaterialTheme.colorScheme.primary,
                         selectedTextColor = MaterialTheme.colorScheme.primary,
-                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                        indicatorColor = MaterialTheme.colorScheme.onPrimary
                     )
                 )
                 NavigationBarItem(
@@ -140,7 +143,7 @@ fun HomeScreenContent() {
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = MaterialTheme.colorScheme.primary,
                         selectedTextColor = MaterialTheme.colorScheme.primary,
-                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                        indicatorColor = MaterialTheme.colorScheme.onPrimary
                     )
                 )
             }
@@ -346,17 +349,17 @@ fun WelcomeCard() {
     }
 }
 
-data class CategoryItemData(val nameRes: Int, val icon: ImageVector)
+data class CategoryItemData(val nameRes: Int, val iconRes: Int)
 
 @Composable
 fun CategoryGrid(onCategoryClick: (CategoryItemData) -> Unit) {
     val categories = listOf(
-        CategoryItemData(R.string.cat_fitrah, Icons.Default.ShoppingBag),
-        CategoryItemData(R.string.cat_gold, Icons.Default.BrightnessHigh),
-        CategoryItemData(R.string.cat_silver, Icons.Default.BrightnessMedium),
-        CategoryItemData(R.string.cat_savings, Icons.Default.AccountBalanceWallet),
-        CategoryItemData(R.string.cat_income, Icons.Default.MonetizationOn),
-        CategoryItemData(R.string.cat_rikaz, Icons.Default.Inventory2)
+        CategoryItemData(R.string.cat_fitrah, R.drawable.img_fitrah),
+        CategoryItemData(R.string.cat_gold, R.drawable.img_gold),
+        CategoryItemData(R.string.cat_silver, R.drawable.img_silver),
+        CategoryItemData(R.string.cat_savings, R.drawable.img_savings),
+        CategoryItemData(R.string.cat_income, R.drawable.img_income),
+        CategoryItemData(R.string.cat_rikaz, R.drawable.img_rikaz)
     )
 
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
@@ -414,10 +417,10 @@ fun CategoryItem(category: CategoryItemData, modifier: Modifier = Modifier, onCl
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                category.icon,
+                painter = painterResource(category.iconRes),
                 contentDescription = stringResource(category.nameRes),
-                modifier = Modifier.size(40.dp),
-                tint = MaterialTheme.colorScheme.primary
+                modifier = Modifier.size(50.dp),
+                tint = Color.Unspecified
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(

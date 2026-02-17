@@ -379,7 +379,7 @@ fun SilverCalculatorTabContent(state: SilverState, onEvent: (SilverEvent) -> Uni
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.clickable {
-                        Utils.searchOnWeb(context, context.getString(R.string.gold_price_per_gram))
+                        Utils.searchOnWeb(context, context.getString(R.string.silver_price_per_gram))
                     }
                 )
             }
