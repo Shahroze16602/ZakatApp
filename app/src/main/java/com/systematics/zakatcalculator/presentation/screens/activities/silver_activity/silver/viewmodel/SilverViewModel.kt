@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.systematics.zakatcalculator.presentation.screens.activities.silver_activity.silver.events.SilverEvent
 import com.systematics.zakatcalculator.presentation.screens.activities.silver_activity.silver.state.SilverCalculationResult
 import com.systematics.zakatcalculator.presentation.screens.activities.silver_activity.silver.state.SilverState
+import com.systematics.zakatcalculator.utils.NumberFormatters
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -61,8 +62,8 @@ class SilverViewModel : ViewModel() {
             _state.update { 
                 it.copy(
                     calculationResult = SilverCalculationResult.Success(
-                        grams = String.format("%.2f", zakatGrams),
-                        cash = String.format("%,.0f", zakatCash)
+                        grams = NumberFormatters.formatTwoDecimals(zakatGrams),
+                        cash = NumberFormatters.formatNoDecimals(zakatCash)
                     ),
                     showSummary = false
                 )

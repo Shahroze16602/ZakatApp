@@ -2,7 +2,11 @@ package com.systematics.zakatcalculator.presentation.screens.activities.fitrah_a
 
 import androidx.lifecycle.ViewModel
 import com.systematics.zakatcalculator.presentation.screens.activities.fitrah_activity.fitrah.events.FitrahEvent
+import com.systematics.zakatcalculator.presentation.screens.activities.fitrah_activity.fitrah.state.FitrahPayWith
+import com.systematics.zakatcalculator.presentation.screens.activities.fitrah_activity.fitrah.state.FitrahResult
 import com.systematics.zakatcalculator.presentation.screens.activities.fitrah_activity.fitrah.state.FitrahState
+import com.systematics.zakatcalculator.presentation.screens.activities.fitrah_activity.fitrah.state.FitrahUnit
+import com.systematics.zakatcalculator.utils.NumberFormatters
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -58,18 +62,21 @@ class FitrahViewModel : ViewModel() {
 
     private fun calculateZakat() {
         val state = _state.value
-        val multiplier = if (state.unit.equals("Litre", ignoreCase = true)) 3.5 else 2.5
+        val multiplier = if (state.unit == FitrahUnit.LITRE) 3.5 else 2.5
         val people = state.numberOfPeople
         val amountOfRice = people * multiplier
         
-        val resultString = if (state.payWith.equals("Money", ignoreCase = true)) {
+        val result = if (state.payWith == FitrahPayWith.MONEY) {
             val price = state.pricePerUnit.toDoubleOrNull() ?: 0.0
             val totalPrice = amountOfRice * price
-            String.format("%.2f", totalPrice)
+            FitrahResult.Money(NumberFormatters.formatTwoDecimals(totalPrice))
         } else {
-            String.format("%.1f %s", amountOfRice, state.unit)
+            FitrahResult.Rice(
+                amount = NumberFormatters.formatOneDecimal(amountOfRice),
+                unit = state.unit
+            )
         }
         
-        _state.update { it.copy(result = resultString) }
+        _state.update { it.copy(result = result) }
     }
 }

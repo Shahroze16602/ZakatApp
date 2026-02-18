@@ -1,9 +1,11 @@
 package com.systematics.zakatcalculator.presentation.screens.activities.gold_activity.gold.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.systematics.zakatcalculator.R
 import com.systematics.zakatcalculator.presentation.screens.activities.gold_activity.gold.events.GoldEvent
 import com.systematics.zakatcalculator.presentation.screens.activities.gold_activity.gold.state.GoldCalculationResult
 import com.systematics.zakatcalculator.presentation.screens.activities.gold_activity.gold.state.GoldState
+import com.systematics.zakatcalculator.utils.NumberFormatters
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,7 +39,7 @@ class GoldViewModel : ViewModel() {
                 _state.update { it.copy(goldPrice = event.value) }
             }
             is GoldEvent.UpdateNisabType -> {
-                _state.update { it.copy(nisabType = event.value) }
+                _state.update { it.copy(nisabTypeRes = event.value) }
             }
             is GoldEvent.Calculate -> {
                 calculateZakat()
@@ -56,7 +58,7 @@ class GoldViewModel : ViewModel() {
         val quantity = state.goldQuantity.toDoubleOrNull() ?: 0.0
         val price = state.goldPrice.toDoubleOrNull() ?: 0.0
 
-        val nisabValue = if (state.nisabType == "87.48 gr") 87.48 else 85.0
+        val nisabValue = if (state.nisabTypeRes == R.string.gold_nisab_value_1) 87.48 else 85.0
 
         if (quantity >= nisabValue) {
             val zakatGrams = quantity * 0.025
@@ -64,8 +66,8 @@ class GoldViewModel : ViewModel() {
             _state.update { 
                 it.copy(
                     calculationResult = GoldCalculationResult.Success(
-                        grams = String.format("%.2f", zakatGrams),
-                        cash = String.format("%,.0f", zakatCash)
+                        grams = NumberFormatters.formatTwoDecimals(zakatGrams),
+                        cash = NumberFormatters.formatNoDecimals(zakatCash)
                     ),
                     showSummary = false
                 )

@@ -23,7 +23,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -248,11 +247,6 @@ fun CalculatorTabContent(state: GoldState, onEvent: (GoldEvent) -> Unit) {
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.weight(1f)
                 )
-                Icon(
-                    Icons.AutoMirrored.Filled.HelpOutline,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
 
             Text(
@@ -284,29 +278,15 @@ fun CalculatorTabContent(state: GoldState, onEvent: (GoldEvent) -> Unit) {
                         .clip(RoundedCornerShape(4.dp))
                 ) {
                     NisabOption(
-                        stringResource(R.string.gold_nisab_value_1),
-                        state.nisabType == stringResource(R.string.gold_nisab_value_1)
-                    ) {
-                        onEvent(
-                            GoldEvent.UpdateNisabType(it)
-                        )
-                    }
+                        labelRes = R.string.gold_nisab_value_1,
+                        isSelected = state.nisabTypeRes == R.string.gold_nisab_value_1
+                    ) { onEvent(GoldEvent.UpdateNisabType(it)) }
                     NisabOption(
-                        stringResource(R.string.gold_nisab_value_2),
-                        state.nisabType == stringResource(R.string.gold_nisab_value_2)
-                    ) {
-                        onEvent(
-                            GoldEvent.UpdateNisabType(it)
-                        )
-                    }
+                        labelRes = R.string.gold_nisab_value_2,
+                        isSelected = state.nisabTypeRes == R.string.gold_nisab_value_2
+                    ) { onEvent(GoldEvent.UpdateNisabType(it)) }
                 }
                 Spacer(modifier = Modifier.width(16.dp))
-                Icon(
-                    Icons.AutoMirrored.Filled.HelpOutline,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
-                )
             }
 
             CommonInputFieldLabel(stringResource(R.string.gold_quantity))
@@ -532,7 +512,7 @@ fun CalculatorTabContent(state: GoldState, onEvent: (GoldEvent) -> Unit) {
                             Spacer(modifier = Modifier.height(8.dp))
                             SummaryRow(stringResource(R.string.gold_quantity), state.goldQuantity)
                             SummaryRow(stringResource(R.string.gold_price), state.goldPrice)
-                            SummaryRow(stringResource(R.string.nisab), state.nisabType)
+                            SummaryRow(stringResource(R.string.nisab), stringResource(state.nisabTypeRes))
                             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                             val resultText = when (val calc = state.calculationResult) {
                                 is GoldCalculationResult.Success -> "${calc.cash} ${stringResource(R.string.cash)}"
@@ -571,18 +551,18 @@ private fun SummaryRow(label: String, value: String, isBold: Boolean = false) {
 }
 
 @Composable
-fun NisabOption(text: String, isSelected: Boolean, onClick: (String) -> Unit) {
+fun NisabOption(labelRes: Int, isSelected: Boolean, onClick: (Int) -> Unit) {
     Box(
         modifier = Modifier
             .background(
                 if (isSelected) MaterialTheme.colorScheme.primaryContainer
                 else MaterialTheme.colorScheme.surface.copy(alpha = 0f)
             )
-            .clickable { onClick(text) }
+            .clickable { onClick(labelRes) }
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Text(
-            text = text,
+            text = stringResource(labelRes),
             color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
             fontSize = 14.sp
         )

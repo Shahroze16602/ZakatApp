@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.systematics.zakatcalculator.presentation.screens.activities.income_activity.income.events.IncomeEvent
 import com.systematics.zakatcalculator.presentation.screens.activities.income_activity.income.state.IncomeCalculationResult
 import com.systematics.zakatcalculator.presentation.screens.activities.income_activity.income.state.IncomeState
+import com.systematics.zakatcalculator.utils.NumberFormatters
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -46,7 +47,7 @@ class IncomeViewModel : ViewModel() {
             _state.update {
                 it.copy(
                     calculationResult = IncomeCalculationResult.Success(
-                        amount = String.format("%,.0f", zakat)
+                        amount = NumberFormatters.formatNoDecimals(zakat)
                     ),
                     showSummary = false
                 )

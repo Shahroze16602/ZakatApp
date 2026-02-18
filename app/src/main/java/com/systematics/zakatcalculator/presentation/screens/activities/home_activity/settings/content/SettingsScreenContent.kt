@@ -2,11 +2,9 @@ package com.systematics.zakatcalculator.presentation.screens.activities.home_act
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,41 +13,35 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Policy
-import androidx.compose.material.icons.filled.PrivacyTip
-import androidx.compose.material.icons.filled.RateReview
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.StarRate
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.systematics.zakatcalculator.BuildConfig
 import com.systematics.zakatcalculator.R
-import com.systematics.zakatcalculator.ui.theme.ZakatCalculatorTheme
-import androidx.core.net.toUri
 import com.systematics.zakatcalculator.presentation.screens.components.CommonAppBar
+import com.systematics.zakatcalculator.ui.theme.ZakatCalculatorTheme
 
 @Composable
 fun SettingsScreenContent(onBackClick: () -> Unit = {}) {
@@ -76,7 +68,7 @@ fun SettingsList(context: Context) {
     val items = listOf(
         SettingsItemData(stringResource(R.string.rate_us), Icons.Default.StarRate) { rateUs(context) },
         SettingsItemData(stringResource(R.string.share_app), Icons.Default.Share) { shareApp(context) },
-        SettingsItemData(stringResource(R.string.privacy_policy), Icons.Default.PrivacyTip) { openPrivacyPolicy(context) },
+        SettingsItemData(stringResource(R.string.privacy_policy), Icons.Default.Policy) { openPrivacyPolicy(context) },
         SettingsItemData(stringResource(R.string.app_version), Icons.Default.Info, BuildConfig.VERSION_NAME)
     )
 
@@ -148,14 +140,18 @@ private fun rateUs(context: Context) {
     context.startActivity(intent)
 }
 
-private fun shareApp(context: Context) {
-    val sendIntent: Intent = Intent().apply {
-        action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_TEXT, context.getString(R.string.share_app_text))
-        type = context.getString(R.string.mime_text_plain)
+fun shareApp(context: Context) {
+    val appPackageName = context.packageName
+    val message = context.getString(R.string.share_app_text, appPackageName)
+
+    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, message)
     }
-    val shareIntent = Intent.createChooser(sendIntent, null)
-    context.startActivity(shareIntent)
+
+    context.startActivity(
+        Intent.createChooser(shareIntent, context.getString(R.string.share_via))
+    )
 }
 
 private fun openPrivacyPolicy(context: Context) {

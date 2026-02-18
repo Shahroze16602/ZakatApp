@@ -1,5 +1,6 @@
 package com.systematics.zakatcalculator.presentation.screens.activities.gold_activity.gold.events
 
+import androidx.annotation.StringRes
 import com.systematics.zakatcalculator.presentation.screens.models.ZakatTab
 
 sealed class GoldEvent {
@@ -10,7 +11,7 @@ sealed class GoldEvent {
     data class UpdateRequirement3(val value: Boolean) : GoldEvent()
     data class UpdateGoldQuantity(val value: String) : GoldEvent()
     data class UpdateGoldPrice(val value: String) : GoldEvent()
-    data class UpdateNisabType(val value: String) : GoldEvent()
+    data class UpdateNisabType(@StringRes val value: Int) : GoldEvent()
     object Calculate : GoldEvent()
     object ToggleSummary : GoldEvent()
     object ResetCalculation : GoldEvent()

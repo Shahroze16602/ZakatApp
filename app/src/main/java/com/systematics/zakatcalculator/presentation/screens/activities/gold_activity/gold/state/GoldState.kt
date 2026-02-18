@@ -1,5 +1,7 @@
 package com.systematics.zakatcalculator.presentation.screens.activities.gold_activity.gold.state
 
+import androidx.annotation.StringRes
+import com.systematics.zakatcalculator.R
 import com.systematics.zakatcalculator.presentation.screens.models.ZakatTab
 
 data class GoldState(
@@ -12,7 +14,7 @@ data class GoldState(
     // Calculator
     val goldQuantity: String = "",
     val goldPrice: String = "",
-    val nisabType: String = "87.48 gr", // Toggle in UI: 87.48 or 85.0
+    @StringRes val nisabTypeRes: Int = R.string.gold_nisab_value_1, // Toggle in UI: 87.48 or 85.0
     val calculationResult: GoldCalculationResult? = null,
     val showSummary: Boolean = false
 )

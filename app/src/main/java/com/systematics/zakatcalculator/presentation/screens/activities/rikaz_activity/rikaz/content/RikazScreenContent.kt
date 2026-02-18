@@ -247,11 +247,6 @@ private fun RikazCalculatorSection(state: RikazState, onEvent: (RikazEvent) -> U
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.weight(1f)
                 )
-                Icon(
-                    Icons.Default.Info,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))

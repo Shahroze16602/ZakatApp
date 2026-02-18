@@ -2,12 +2,14 @@ package com.systematics.zakatcalculator.presentation.screens.activities.income_a
 
 import com.systematics.zakatcalculator.presentation.screens.models.ZakatTab
 
+private const val DEFAULT_GOLD_PRICE = 45000
+
 data class IncomeState(
     val isPaid: Boolean = false,
     val selectedTab: ZakatTab = ZakatTab.Calculator,
     val income: String = "",
     val expense: String = "",
-    val goldPrice: String = "45000",
+    val goldPrice: String = DEFAULT_GOLD_PRICE.toString(),
     val requirement1: Boolean = false,
     val requirement2: Boolean = false,
     val requirement3: Boolean = false,

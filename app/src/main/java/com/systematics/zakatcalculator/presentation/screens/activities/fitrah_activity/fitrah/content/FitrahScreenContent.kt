@@ -23,7 +23,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
@@ -53,7 +52,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.systematics.zakatcalculator.R
 import com.systematics.zakatcalculator.presentation.screens.activities.fitrah_activity.fitrah.events.FitrahEvent
+import com.systematics.zakatcalculator.presentation.screens.activities.fitrah_activity.fitrah.state.FitrahPayWith
+import com.systematics.zakatcalculator.presentation.screens.activities.fitrah_activity.fitrah.state.FitrahResult
 import com.systematics.zakatcalculator.presentation.screens.activities.fitrah_activity.fitrah.state.FitrahState
+import com.systematics.zakatcalculator.presentation.screens.activities.fitrah_activity.fitrah.state.FitrahUnit
 import com.systematics.zakatcalculator.presentation.screens.components.CommonAppBar
 import com.systematics.zakatcalculator.presentation.screens.components.CommonDropdownField
 import com.systematics.zakatcalculator.presentation.screens.components.CommonInfoBox
@@ -152,12 +154,6 @@ fun CalculatorSection(context: Context, state: FitrahState, onEvent: (FitrahEven
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.weight(1f)
                 )
-                Icon(
-                    Icons.Default.Info,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
             }
             Text(
                 text = stringResource(R.string.fitrah_calculation_prompt),
@@ -212,25 +208,27 @@ fun CalculatorSection(context: Context, state: FitrahState, onEvent: (FitrahEven
                 }
             }
 
+            val payWithOptions = FitrahPayWith.entries
             CommonInputFieldLabel(stringResource(R.string.pay_with))
             CommonDropdownField(
-                state.payWith,
-                listOf(stringResource(R.string.rice), stringResource(R.string.money))
-            ) { onEvent(FitrahEvent.UpdatePayWith(it)) }
-
-            CommonInputFieldLabel(stringResource(R.string.unit_of_rice))
-            CommonDropdownField(
-                state.unit,
-                listOf(stringResource(R.string.unit_kg), stringResource(R.string.unit_litre))
-            ) {
-                onEvent(
-                    FitrahEvent.UpdateUnit(
-                        it
-                    )
-                )
+                value = stringResource(state.payWith.labelRes),
+                options = payWithOptions.map { stringResource(it.labelRes) }
+            ) { selectedLabel ->
+                val selected = payWithOptions.first { context.getString(it.labelRes) == selectedLabel }
+                onEvent(FitrahEvent.UpdatePayWith(selected))
             }
 
-            if (state.payWith == stringResource(R.string.money)) {
+            val unitOptions = FitrahUnit.entries
+            CommonInputFieldLabel(stringResource(R.string.unit_of_rice))
+            CommonDropdownField(
+                value = stringResource(state.unit.labelRes),
+                options = unitOptions.map { stringResource(it.labelRes) }
+            ) { selectedLabel ->
+                val selected = unitOptions.first { context.getString(it.labelRes) == selectedLabel }
+                onEvent(FitrahEvent.UpdateUnit(selected))
+            }
+
+            if (state.payWith == FitrahPayWith.MONEY) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -251,7 +249,7 @@ fun CalculatorSection(context: Context, state: FitrahState, onEvent: (FitrahEven
                             Utils.searchOnWeb(
                                 context = context,
                                 query = context.getString(
-                                    if (state.unit == context.getString(R.string.unit_kg)) {
+                                    if (state.unit == FitrahUnit.KG) {
                                         R.string.rice_price_per_kg
                                     } else {
                                         R.string.rice_price_per_litre
@@ -269,7 +267,7 @@ fun CalculatorSection(context: Context, state: FitrahState, onEvent: (FitrahEven
                     shape = RoundedCornerShape(32.dp),
                     trailingIcon = {
                         Text(
-                            "${stringResource(R.string.per)} ${state.unit}",
+                            "${stringResource(R.string.per)} ${stringResource(state.unit.labelRes)}",
                             modifier = Modifier.padding(end = 16.dp),
                             color = MaterialTheme.colorScheme.outline
                         )
@@ -301,7 +299,7 @@ fun CalculatorSection(context: Context, state: FitrahState, onEvent: (FitrahEven
                 )
             }
 
-            state.result?.let {
+            state.result?.let { result ->
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Calculation Result Card
@@ -325,13 +323,16 @@ fun CalculatorSection(context: Context, state: FitrahState, onEvent: (FitrahEven
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = state.result,
+                            text = when (result) {
+                                is FitrahResult.Money -> result.amount
+                                is FitrahResult.Rice -> "${result.amount} ${stringResource(result.unit.labelRes)}"
+                            },
                             fontSize = 32.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Text(
-                            text = if (state.payWith == stringResource(R.string.money)) stringResource(
+                            text = if (state.payWith == FitrahPayWith.MONEY) stringResource(
                                 R.string.total_amount_in_money
                             ) else stringResource(R.string.kg_of_rice_or_staple_food),
                             fontSize = 14.sp,
@@ -404,19 +405,25 @@ fun CalculatorSection(context: Context, state: FitrahState, onEvent: (FitrahEven
                                 stringResource(R.string.number_of_people),
                                 "${state.numberOfPeople}"
                             )
-                            SummaryRow(stringResource(R.string.payment_method), state.payWith)
-                            if (state.payWith == stringResource(R.string.money)) {
+                            SummaryRow(
+                                stringResource(R.string.payment_method),
+                                stringResource(state.payWith.labelRes)
+                            )
+                            if (state.payWith == FitrahPayWith.MONEY) {
                                 SummaryRow(
-                                    "${stringResource(R.string.price_per)} ${state.unit}",
+                                    "${stringResource(R.string.price_per)} ${stringResource(state.unit.labelRes)}",
                                     state.pricePerUnit
                                 )
                             } else {
-                                SummaryRow(stringResource(R.string.unit), state.unit)
+                                SummaryRow(stringResource(R.string.unit), stringResource(state.unit.labelRes))
                             }
                             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                             SummaryRow(
                                 stringResource(R.string.total_result),
-                                state.result,
+                                when (result) {
+                                    is FitrahResult.Money -> result.amount
+                                    is FitrahResult.Rice -> "${result.amount} ${stringResource(result.unit.labelRes)}"
+                                },
                                 isBold = true
                             )
                         }
@@ -478,8 +485,8 @@ fun FitrahScreenContentPreview() {
                 hasExcessFood = true,
                 selectedTab = ZakatTab.Calculator,
                 numberOfPeople = 2,
-                payWith = stringResource(R.string.rice),
-                unit = stringResource(R.string.unit_kg),
+                payWith = FitrahPayWith.RICE,
+                unit = FitrahUnit.KG,
                 pricePerUnit = "",
                 result = null
             ),

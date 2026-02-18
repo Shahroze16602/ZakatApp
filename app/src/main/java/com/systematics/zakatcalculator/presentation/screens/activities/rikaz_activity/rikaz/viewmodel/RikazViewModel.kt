@@ -3,6 +3,7 @@ package com.systematics.zakatcalculator.presentation.screens.activities.rikaz_ac
 import androidx.lifecycle.ViewModel
 import com.systematics.zakatcalculator.presentation.screens.activities.rikaz_activity.rikaz.events.RikazEvent
 import com.systematics.zakatcalculator.presentation.screens.activities.rikaz_activity.rikaz.state.RikazState
+import com.systematics.zakatcalculator.utils.NumberFormatters
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -27,7 +28,7 @@ class RikazViewModel : ViewModel() {
                 val zakatAmount = treasureValue * 0.20
                 _state.update {
                     it.copy(
-                        zakatAmount = String.format("%,.0f", zakatAmount),
+                        zakatAmount = NumberFormatters.formatNoDecimals(zakatAmount),
                         showSummary = false
                     )
                 }

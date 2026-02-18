@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.systematics.zakatcalculator.presentation.screens.activities.savings_activity.savings.events.SavingsEvent
 import com.systematics.zakatcalculator.presentation.screens.activities.savings_activity.savings.state.SavingsCalculationResult
 import com.systematics.zakatcalculator.presentation.screens.activities.savings_activity.savings.state.SavingsState
+import com.systematics.zakatcalculator.utils.NumberFormatters
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -45,7 +46,7 @@ class SavingsViewModel : ViewModel() {
             _state.update {
                 it.copy(
                     calculationResult = SavingsCalculationResult.Success(
-                        amount = String.format("%,.0f", zakat)
+                        amount = NumberFormatters.formatNoDecimals(zakat)
                     ),
                     showSummary = false
                 )

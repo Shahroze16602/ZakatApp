@@ -68,6 +68,7 @@ import com.systematics.zakatcalculator.presentation.screens.components.CommonPai
 import com.systematics.zakatcalculator.presentation.screens.components.CommonZakatTabs
 import com.systematics.zakatcalculator.presentation.screens.models.ZakatTab
 import com.systematics.zakatcalculator.utils.Utils
+import com.systematics.zakatcalculator.utils.NumberFormatters
 
 @Composable
 fun SavingsScreenContent(
@@ -284,11 +285,6 @@ private fun SavingsCalculatorSection(state: SavingsState, onEvent: (SavingsEvent
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.weight(1f)
                 )
-                Icon(
-                    Icons.Default.Info,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -462,11 +458,11 @@ private fun SavingsCalculatorSection(state: SavingsState, onEvent: (SavingsEvent
 
                             SummaryRow(
                                 stringResource(R.string.net_savings),
-                                String.format("%,.0f", netSavings)
+                                NumberFormatters.formatNoDecimals(netSavings)
                             )
                             SummaryRow(
                                 stringResource(R.string.nisab_threshold),
-                                String.format("%,.0f", nisab)
+                                NumberFormatters.formatNoDecimals(nisab)
                             )
                             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                             SummaryRow(

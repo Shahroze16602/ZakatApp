@@ -1,5 +1,7 @@
 package com.systematics.zakatcalculator.presentation.screens.activities.silver_activity.silver.state
 
+import androidx.annotation.StringRes
+import com.systematics.zakatcalculator.R
 import com.systematics.zakatcalculator.presentation.screens.models.ZakatTab
 
 data class SilverState(
@@ -12,7 +14,7 @@ data class SilverState(
     // Calculator
     val silverQuantity: String = "",
     val silverPrice: String = "",
-    val nisabType: String = "612.36 gr", // Standard Silver Nisab
+    @StringRes val nisabTypeRes: Int = R.string.silver_nisab_value, // Standard Silver Nisab
     val calculationResult: SilverCalculationResult? = null,
     val showSummary: Boolean = false
 )

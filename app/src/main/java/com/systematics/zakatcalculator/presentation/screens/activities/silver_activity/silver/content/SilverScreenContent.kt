@@ -296,11 +296,6 @@ fun SilverCalculatorTabContent(state: SilverState, onEvent: (SilverEvent) -> Uni
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.weight(1f)
                 )
-                Icon(
-                    Icons.AutoMirrored.Filled.HelpOutline,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
 
             Text(
@@ -336,12 +331,6 @@ fun SilverCalculatorTabContent(state: SilverState, onEvent: (SilverEvent) -> Uni
                     )
                 }
                 Spacer(modifier = Modifier.width(16.dp))
-                Icon(
-                    Icons.AutoMirrored.Filled.HelpOutline,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
-                )
             }
 
             CommonInputFieldLabel(stringResource(R.string.silver_quantity))

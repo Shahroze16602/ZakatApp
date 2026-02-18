@@ -54,6 +54,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.systematics.zakatcalculator.R
@@ -67,11 +68,13 @@ import com.systematics.zakatcalculator.presentation.screens.components.CommonPai
 import com.systematics.zakatcalculator.presentation.screens.components.CommonZakatTabs
 import com.systematics.zakatcalculator.presentation.screens.models.ZakatTab
 import com.systematics.zakatcalculator.utils.Utils
+import com.systematics.zakatcalculator.utils.NumberFormatters
 
+@Preview
 @Composable
 fun IncomeScreenContent(
-    state: IncomeState,
-    onEvent: (IncomeEvent) -> Unit
+    state: IncomeState = IncomeState(),
+    onEvent: (IncomeEvent) -> Unit = {}
 ) {
     val context = LocalContext.current
 
@@ -298,11 +301,6 @@ private fun IncomeCalculatorSection(state: IncomeState, onEvent: (IncomeEvent) -
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.weight(1f)
                 )
-                Icon(
-                    Icons.Default.Info,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -459,11 +457,11 @@ private fun IncomeCalculatorSection(state: IncomeState, onEvent: (IncomeEvent) -
 
                             SummaryRow(
                                 stringResource(R.string.net_income),
-                                String.format("%,.0f", netIncome)
+                                NumberFormatters.formatNoDecimals(netIncome)
                             )
                             SummaryRow(
                                 stringResource(R.string.nisab_threshold),
-                                String.format("%,.0f", nisab)
+                                NumberFormatters.formatNoDecimals(nisab)
                             )
 
                             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
