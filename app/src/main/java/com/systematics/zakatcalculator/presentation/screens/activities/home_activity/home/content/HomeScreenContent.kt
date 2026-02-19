@@ -1,10 +1,12 @@
 package com.systematics.zakatcalculator.presentation.screens.activities.home_activity.home.content
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
-import android.graphics.Paint
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +37,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Wallet
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -47,8 +50,14 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -58,10 +67,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.systematics.zakatcalculator.R
 import com.systematics.zakatcalculator.presentation.screens.activities.fitrah_activity.FitrahActivity
 import com.systematics.zakatcalculator.presentation.screens.activities.gold_activity.GoldActivity
@@ -72,6 +85,7 @@ import com.systematics.zakatcalculator.presentation.screens.activities.rikaz_act
 import com.systematics.zakatcalculator.presentation.screens.activities.savings_activity.SavingsActivity
 import com.systematics.zakatcalculator.presentation.screens.activities.silver_activity.SilverActivity
 import com.systematics.zakatcalculator.ui.theme.ZakatCalculatorTheme
+import com.systematics.zakatcalculator.utils.ZakatPreferences
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.chrono.HijrahDate
@@ -81,11 +95,55 @@ import java.util.Locale
 
 @Composable
 fun HomeScreenContent() {
+    val context = LocalContext.current
     val pagerState = rememberPagerState(pageCount = { 3 })
     val scope = rememberCoroutineScope()
+    var showExitDialog by remember { mutableStateOf(false) }
 
-    BackHandler(enabled = pagerState.currentPage != 0) {
-        scope.launch { pagerState.animateScrollToPage(0) }
+    BackHandler {
+        if (pagerState.currentPage != 0) {
+            scope.launch { pagerState.animateScrollToPage(0) }
+        } else {
+            showExitDialog = true
+        }
+    }
+
+    if (showExitDialog) {
+        AlertDialog(
+            onDismissRequest = { showExitDialog = false },
+            title = {
+                Text(
+                    text = stringResource(R.string.exit_dialog_title),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.exit_dialog_message),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showExitDialog = false
+                    (context as? Activity)?.finish()
+                }) {
+                    Text(
+                        text = stringResource(R.string.exit),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showExitDialog = false }) {
+                    Text(
+                        text = stringResource(R.string.cancel),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     }
 
     Scaffold(
@@ -173,6 +231,19 @@ fun HomeScreenContent() {
 @Composable
 fun HomeTabContent() {
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var categoryStatuses by remember { mutableStateOf(loadCategoryStatuses(context)) }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                categoryStatuses = loadCategoryStatuses(context)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -183,18 +254,21 @@ fun HomeTabContent() {
         Spacer(modifier = Modifier.height(16.dp))
 //        WelcomeCard()
 //        Spacer(modifier = Modifier.height(16.dp))
-        CategoryGrid(onCategoryClick = { category ->
-            val intent = when (category.nameRes) {
-                R.string.cat_fitrah -> Intent(context, FitrahActivity::class.java)
-                R.string.cat_gold -> Intent(context, GoldActivity::class.java)
-                R.string.cat_silver -> Intent(context, SilverActivity::class.java)
-                R.string.cat_savings -> Intent(context, SavingsActivity::class.java)
-                R.string.cat_income -> Intent(context, IncomeActivity::class.java)
-                R.string.cat_rikaz -> Intent(context, RikazActivity::class.java)
-                else -> null
+        CategoryGrid(
+            statuses = categoryStatuses,
+            onCategoryClick = { category ->
+                val intent = when (category.nameRes) {
+                    R.string.cat_fitrah -> Intent(context, FitrahActivity::class.java)
+                    R.string.cat_gold -> Intent(context, GoldActivity::class.java)
+                    R.string.cat_silver -> Intent(context, SilverActivity::class.java)
+                    R.string.cat_savings -> Intent(context, SavingsActivity::class.java)
+                    R.string.cat_income -> Intent(context, IncomeActivity::class.java)
+                    R.string.cat_rikaz -> Intent(context, RikazActivity::class.java)
+                    else -> null
+                }
+                intent?.let { context.startActivity(it) }
             }
-            intent?.let { context.startActivity(it) }
-        })
+        )
         Spacer(modifier = Modifier.height(16.dp))
 //        ManageAssetsCard()
 //        Spacer(modifier = Modifier.height(16.dp))
@@ -301,7 +375,7 @@ fun DateCard() {
     }
 }
 
-@Composable
+/*@Composable
 fun WelcomeCard() {
     Card(
         modifier = Modifier
@@ -365,19 +439,23 @@ fun WelcomeCard() {
             }
         }
     }
-}
+}*/
 
-data class CategoryItemData(val nameRes: Int, val iconRes: Int)
+data class CategoryItemData(val nameRes: Int, val iconRes: Int, val prefPrefix: String)
+data class CategoryStatus(val isQualified: Boolean, val isFulfilled: Boolean)
 
 @Composable
-fun CategoryGrid(onCategoryClick: (CategoryItemData) -> Unit) {
+fun CategoryGrid(
+    statuses: Map<Int, CategoryStatus>,
+    onCategoryClick: (CategoryItemData) -> Unit
+) {
     val categories = listOf(
-        CategoryItemData(R.string.cat_fitrah, R.drawable.img_fitrah),
-        CategoryItemData(R.string.cat_gold, R.drawable.img_gold),
-        CategoryItemData(R.string.cat_silver, R.drawable.img_silver),
-        CategoryItemData(R.string.cat_savings, R.drawable.img_savings),
-        CategoryItemData(R.string.cat_income, R.drawable.img_income),
-        CategoryItemData(R.string.cat_rikaz, R.drawable.img_rikaz)
+        CategoryItemData(R.string.cat_fitrah, R.drawable.img_fitrah, ZakatPreferences.FITRAH_PREFIX),
+        CategoryItemData(R.string.cat_gold, R.drawable.img_gold, ZakatPreferences.GOLD_PREFIX),
+        CategoryItemData(R.string.cat_silver, R.drawable.img_silver, ZakatPreferences.SILVER_PREFIX),
+        CategoryItemData(R.string.cat_savings, R.drawable.img_savings, ZakatPreferences.SAVINGS_PREFIX),
+        CategoryItemData(R.string.cat_income, R.drawable.img_income, ZakatPreferences.INCOME_PREFIX),
+        CategoryItemData(R.string.cat_rikaz, R.drawable.img_rikaz, ZakatPreferences.RIKAZ_PREFIX)
     )
 
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
@@ -386,17 +464,23 @@ fun CategoryGrid(onCategoryClick: (CategoryItemData) -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             CategoryItem(
-                categories[0],
-                Modifier.weight(1f),
-                onClick = { onCategoryClick(categories[0]) })
+                category = categories[0],
+                modifier = Modifier.weight(1f),
+                status = statuses[categories[0].nameRes],
+                onClick = { onCategoryClick(categories[0]) }
+            )
             CategoryItem(
-                categories[1],
-                Modifier.weight(1f),
-                onClick = { onCategoryClick(categories[1]) })
+                category = categories[1],
+                modifier = Modifier.weight(1f),
+                status = statuses[categories[1].nameRes],
+                onClick = { onCategoryClick(categories[1]) }
+            )
             CategoryItem(
-                categories[2],
-                Modifier.weight(1f),
-                onClick = { onCategoryClick(categories[2]) })
+                category = categories[2],
+                modifier = Modifier.weight(1f),
+                status = statuses[categories[2].nameRes],
+                onClick = { onCategoryClick(categories[2]) }
+            )
         }
         Spacer(modifier = Modifier.height(16.dp))
         Row(
@@ -404,23 +488,34 @@ fun CategoryGrid(onCategoryClick: (CategoryItemData) -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             CategoryItem(
-                categories[3],
-                Modifier.weight(1f),
-                onClick = { onCategoryClick(categories[3]) })
+                category = categories[3],
+                modifier = Modifier.weight(1f),
+                status = statuses[categories[3].nameRes],
+                onClick = { onCategoryClick(categories[3]) }
+            )
             CategoryItem(
-                categories[4],
-                Modifier.weight(1f),
-                onClick = { onCategoryClick(categories[4]) })
+                category = categories[4],
+                modifier = Modifier.weight(1f),
+                status = statuses[categories[4].nameRes],
+                onClick = { onCategoryClick(categories[4]) }
+            )
             CategoryItem(
-                categories[5],
-                Modifier.weight(1f),
-                onClick = { onCategoryClick(categories[5]) })
+                category = categories[5],
+                modifier = Modifier.weight(1f),
+                status = statuses[categories[5].nameRes],
+                onClick = { onCategoryClick(categories[5]) }
+            )
         }
     }
 }
 
 @Composable
-fun CategoryItem(category: CategoryItemData, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun CategoryItem(
+    category: CategoryItemData,
+    modifier: Modifier = Modifier,
+    status: CategoryStatus? = null,
+    onClick: () -> Unit
+) {
     Card(
         modifier = modifier
             .aspectRatio(1f),
@@ -429,28 +524,55 @@ fun CategoryItem(category: CategoryItemData, modifier: Modifier = Modifier, onCl
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         onClick = onClick
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                painter = painterResource(category.iconRes),
-                contentDescription = stringResource(category.nameRes),
-                modifier = Modifier.size(50.dp),
-                tint = Color.Unspecified
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = stringResource(category.nameRes),
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium
-            )
+        Box(modifier = Modifier.fillMaxSize()) {
+            val badgeText = when {
+                status?.isFulfilled == true -> stringResource(R.string.badge_fulfilled)
+                status?.isQualified == true -> stringResource(R.string.badge_qualified)
+                else -> null
+            }
+            if (badgeText != null) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = badgeText,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    painter = painterResource(category.iconRes),
+                    contentDescription = stringResource(category.nameRes),
+                    modifier = Modifier.size(50.dp),
+                    tint = Color.Unspecified
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(category.nameRes),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium
+                )
+            }
         }
     }
 }
 
-@Composable
+/*@Composable
 fun ManageAssetsCard() {
     Card(
         modifier = Modifier
@@ -527,7 +649,7 @@ fun ManageAssetsCard() {
             }
         }
     }
-}
+}*/
 
 @Composable
 fun VerseOfTheDayCard() {
@@ -544,7 +666,8 @@ fun VerseOfTheDayCard() {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .border(width = 2.dp, color = MaterialTheme.colorScheme.tertiary, shape = RoundedCornerShape(24.dp)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         shape = RoundedCornerShape(24.dp)
     ) {
@@ -570,7 +693,7 @@ fun VerseOfTheDayCard() {
             Text(
                 text = stringResource(R.string.zakat_verse_day),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(12.dp))
@@ -579,16 +702,60 @@ fun VerseOfTheDayCard() {
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
-                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = verse.second,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
+}
+
+private fun loadCategoryStatuses(context: Context): Map<Int, CategoryStatus> {
+    val prefs = ZakatPreferences(context)
+
+    fun status(prefix: String): CategoryStatus {
+        val fulfilled = prefs.getBoolean(ZakatPreferences.key(prefix, ZakatPreferences.KEY_PAID))
+        val qualifiedFromRequirements = when (prefix) {
+            ZakatPreferences.FITRAH_PREFIX -> {
+                prefs.getBoolean(ZakatPreferences.key(prefix, "can_give_rice")) &&
+                    prefs.getBoolean(ZakatPreferences.key(prefix, "has_excess_food"))
+            }
+            ZakatPreferences.GOLD_PREFIX,
+            ZakatPreferences.SILVER_PREFIX,
+            ZakatPreferences.SAVINGS_PREFIX -> {
+                prefs.getBoolean(ZakatPreferences.key(prefix, "requirement_1")) &&
+                    prefs.getBoolean(ZakatPreferences.key(prefix, "requirement_2")) &&
+                    prefs.getBoolean(ZakatPreferences.key(prefix, "requirement_3"))
+            }
+            ZakatPreferences.INCOME_PREFIX -> {
+                prefs.getBoolean(ZakatPreferences.key(prefix, "requirement_1")) &&
+                    prefs.getBoolean(ZakatPreferences.key(prefix, "requirement_2")) &&
+                    prefs.getBoolean(ZakatPreferences.key(prefix, "requirement_3")) &&
+                    prefs.getBoolean(ZakatPreferences.key(prefix, "requirement_4"))
+            }
+            ZakatPreferences.RIKAZ_PREFIX -> {
+                prefs.getBoolean(ZakatPreferences.key(prefix, "requirement_1"))
+            }
+            else -> false
+        }
+        val qualified = prefs.getBoolean(
+            ZakatPreferences.key(prefix, ZakatPreferences.KEY_QUALIFIED),
+            qualifiedFromRequirements
+        )
+        return CategoryStatus(isQualified = qualified, isFulfilled = fulfilled)
+    }
+
+    return mapOf(
+        R.string.cat_fitrah to status(ZakatPreferences.FITRAH_PREFIX),
+        R.string.cat_gold to status(ZakatPreferences.GOLD_PREFIX),
+        R.string.cat_silver to status(ZakatPreferences.SILVER_PREFIX),
+        R.string.cat_savings to status(ZakatPreferences.SAVINGS_PREFIX),
+        R.string.cat_income to status(ZakatPreferences.INCOME_PREFIX),
+        R.string.cat_rikaz to status(ZakatPreferences.RIKAZ_PREFIX)
+    )
 }
 
 @Preview(showBackground = true)

@@ -99,6 +99,7 @@ fun SavingsScreenContent(
 
                 CommonPaidStatusCard(
                     isPaid = state.isPaid,
+                    isQualified = state.requirement1 && state.requirement2 && state.requirement3,
                     onTogglePaidStatus = { onEvent(SavingsEvent.TogglePaidStatus) }
                 )
 
@@ -277,90 +278,92 @@ private fun SavingsCalculatorSection(state: SavingsState, onEvent: (SavingsEvent
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            if (state.calculationResult == null) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(R.string.calculate_zakat_savings),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Text(
-                    text = stringResource(R.string.calculate_zakat_savings),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.weight(1f)
+                    text = stringResource(R.string.savings_calculation_prompt),
+                    color = MaterialTheme.colorScheme.onSurface
                 )
-            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = stringResource(R.string.savings_calculation_prompt),
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = state.savings,
-                onValueChange = { onEvent(SavingsEvent.UpdateSavings(it)) },
-                label = { Text(stringResource(R.string.savings_label)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            OutlinedTextField(
-                value = state.interests,
-                onValueChange = { onEvent(SavingsEvent.UpdateInterests(it)) },
-                label = { Text(stringResource(R.string.interests_label)) },
-                placeholder = { Text(stringResource(R.string.interests_placeholder)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    stringResource(R.string.gold_price),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.weight(1f)
+                OutlinedTextField(
+                    value = state.savings,
+                    onValueChange = { onEvent(SavingsEvent.UpdateSavings(it)) },
+                    label = { Text(stringResource(R.string.savings_label)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
                 )
-                Icon(
-                    Icons.Default.Search,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp),
-                    tint = MaterialTheme.colorScheme.primary
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = state.interests,
+                    onValueChange = { onEvent(SavingsEvent.UpdateInterests(it)) },
+                    label = { Text(stringResource(R.string.interests_label)) },
+                    placeholder = { Text(stringResource(R.string.interests_placeholder)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    stringResource(R.string.find_current_price),
-                    color = MaterialTheme.colorScheme.primary,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable {
-                        Utils.searchOnWeb(context, context.getString(R.string.gold_price_per_gram))
-                    }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        stringResource(R.string.gold_price),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Icon(
+                        Icons.Default.Search,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        stringResource(R.string.find_current_price),
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.clickable {
+                            Utils.searchOnWeb(context, context.getString(R.string.gold_price_per_gram))
+                        }
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = state.goldPrice,
+                    onValueChange = { onEvent(SavingsEvent.UpdateGoldPrice(it)) },
+                    label = { Text(stringResource(R.string.current_gold_price_per_gram)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
                 )
-            }
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = state.goldPrice,
-                onValueChange = { onEvent(SavingsEvent.UpdateGoldPrice(it)) },
-                label = { Text(stringResource(R.string.current_gold_price_per_gram)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = { onEvent(SavingsEvent.Calculate) },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                Text(text = stringResource(R.string.calculate))
+                Button(
+                    onClick = { onEvent(SavingsEvent.Calculate) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text(text = stringResource(R.string.calculate))
+                }
             }
 
             state.calculationResult?.let { result ->
@@ -451,6 +454,10 @@ private fun SavingsCalculatorSection(state: SavingsState, onEvent: (SavingsEvent
                             SummaryRow(stringResource(R.string.savings_label), state.savings)
                             SummaryRow(stringResource(R.string.interests_label), state.interests)
                             SummaryRow(stringResource(R.string.gold_price), state.goldPrice)
+                            SummaryRow(
+                                stringResource(R.string.zakat_calculation),
+                                "(${state.savings.ifBlank { "0" }} - ${state.interests.ifBlank { "0" }}) x 2.5%"
+                            )
 
                             val netSavings = ((state.savings.toDoubleOrNull() ?: 0.0) - (state.interests.toDoubleOrNull()
                                 ?: 0.0)).coerceAtLeast(0.0)

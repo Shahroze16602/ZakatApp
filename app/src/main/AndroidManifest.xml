@@ -19,6 +19,16 @@
             android:label="@string/title_activity_silver"
             android:theme="@style/Theme.ZakatCalculator" />
         <activity
+            android:name=".presentation.screens.activities.splash_activity.SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.ZakatCalculator">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".presentation.screens.activities.gold_activity.GoldActivity"
             android:exported="false"
             android:label="@string/title_activity_gold"
@@ -45,14 +55,8 @@
             android:theme="@style/Theme.ZakatCalculator" />
         <activity
             android:name=".presentation.screens.activities.home_activity.HomeActivity"
-            android:exported="true"
-            android:theme="@style/Theme.ZakatCalculator">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:exported="false"
+            android:theme="@style/Theme.ZakatCalculator" />
     </application>
 
 </manifest>

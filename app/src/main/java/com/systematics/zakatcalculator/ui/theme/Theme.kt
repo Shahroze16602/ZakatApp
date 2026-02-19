@@ -1,8 +1,6 @@
 package com.systematics.zakatcalculator.ui.theme
 
-import android.app.Activity
 import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -41,19 +39,14 @@ private val LightColorScheme = lightColorScheme(
     tertiaryContainer = Color(0xFFF4E5C2),
     background = Color(0xFFF5F5F5),
     surface = White,
-    onSurface = Black,
+    onSurface = Color(0xFF505050),
     surfaceVariant = VerseBackground,
-    onSurfaceVariant = VerseText
-
-    /* Other default colors to override
-    onBackground = Color(0xFF1C1B1F),
-    */
+    onSurfaceVariant = Color(0xFF505050)
 )
 
 @Composable
 fun ZakatCalculatorTheme(
     darkTheme: Boolean = false,
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {

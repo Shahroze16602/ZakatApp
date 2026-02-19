@@ -53,6 +53,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.systematics.zakatcalculator.R
 import com.systematics.zakatcalculator.presentation.screens.models.ZakatTab
+import java.time.chrono.HijrahDate
+import java.time.temporal.ChronoField
 
 @Preview
 @Composable
@@ -245,8 +247,20 @@ private fun RequirementItem(
 fun CommonPaidStatusCard(
     modifier: Modifier = Modifier,
     isPaid: Boolean,
+    isQualified: Boolean,
     onTogglePaidStatus: () -> Unit
 ) {
+    val lunarYear = HijrahDate.now().get(ChronoField.YEAR)
+    val statusText = when {
+        isPaid -> stringResource(R.string.fulfilled_in_lunar_year, lunarYear)
+        isQualified -> stringResource(R.string.you_are_qualified)
+        else -> stringResource(R.string.not_yet_paid)
+    }
+    val statusColor = when {
+        isPaid || isQualified -> MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.onSecondaryContainer
+    }
+
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(16.dp),
@@ -260,16 +274,15 @@ fun CommonPaidStatusCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = if (isPaid) stringResource(R.string.paid) else stringResource(
-                        R.string.not_yet_paid
-                    ),
+                    text = statusText,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                    color = statusColor
                 )
 
                 Button(
                     onClick = { onTogglePaidStatus() },
+                    enabled = isQualified && !isPaid,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onSecondary

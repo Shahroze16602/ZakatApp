@@ -2,33 +2,35 @@ package com.systematics.zakatcalculator.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
+import com.systematics.zakatcalculator.R
 
-// Set of Material typography styles to start with
+private val DmSansFontFamily = FontFamily(
+    Font(R.font.dm_sans_regular, FontWeight.Normal),
+    Font(R.font.dm_sans_medium, FontWeight.Medium),
+    Font(R.font.dm_sans_semibold, FontWeight.SemiBold),
+    Font(R.font.dm_sans_bold, FontWeight.Bold)
+)
+private val BaseTypography = Typography()
+
+private fun TextStyle.withDmSans(): TextStyle = copy(fontFamily = DmSansFontFamily)
+
 val Typography = Typography(
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
-    )
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
-    )
-    */
+    displayLarge = BaseTypography.displayLarge.withDmSans(),
+    displayMedium = BaseTypography.displayMedium.withDmSans(),
+    displaySmall = BaseTypography.displaySmall.withDmSans(),
+    headlineLarge = BaseTypography.headlineLarge.withDmSans(),
+    headlineMedium = BaseTypography.headlineMedium.withDmSans(),
+    headlineSmall = BaseTypography.headlineSmall.withDmSans(),
+    titleLarge = BaseTypography.titleLarge.withDmSans(),
+    titleMedium = BaseTypography.titleMedium.withDmSans(),
+    titleSmall = BaseTypography.titleSmall.withDmSans(),
+    bodyLarge = BaseTypography.bodyLarge.withDmSans(),
+    bodyMedium = BaseTypography.bodyMedium.withDmSans(),
+    bodySmall = BaseTypography.bodySmall.withDmSans(),
+    labelLarge = BaseTypography.labelLarge.withDmSans(),
+    labelMedium = BaseTypography.labelMedium.withDmSans(),
+    labelSmall = BaseTypography.labelSmall.withDmSans()
 )

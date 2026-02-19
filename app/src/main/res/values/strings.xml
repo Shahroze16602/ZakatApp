@@ -6,7 +6,7 @@
     <string name="view_details">View Details</string>
     <string name="manage_assets">Manage Assets</string>
     <string name="manage_assets_desc">Manage assets to calculate zakat</string>
-    <string name="zakat_al_mal_progress">Zakat al mal payement progress 1447:</string>
+    <string name="zakat_al_mal_progress">Zakat al mal payment progress 1447:</string>
     <string name="zakat_verse_day">Zakat Verse of the day</string>
 
     <string name="home">Home</string>
@@ -21,11 +21,11 @@
     <string name="cat_rikaz">Rikaz</string>
 
     <string name="verse_1">Take from their wealth a charity by which you purify them.</string>
-    <string name="verse_1_ref">(Qurâ€™an 9:103)</string>
+    <string name="verse_1_ref">(Quran 9:103)</string>
     <string name="verse_2">Establish prayer and give zakat, and whatever good you put forward for yourselves - you will find it with Allah.</string>
-    <string name="verse_2_ref">(Qurâ€™an 2:110)</string>
-    <string name="verse_3">Those who spend their wealth in the way of Allahâ€¦ their reward is with their Lord.</string>
-    <string name="verse_3_ref">(Qurâ€™an 2:262)</string>
+    <string name="verse_2_ref">(Quran 2:110)</string>
+    <string name="verse_3">Those who spend their wealth in the way of Allah, their reward is with their Lord.</string>
+    <string name="verse_3_ref">(Quran 2:262)</string>
 
     <string name="definition_purpose">Definition &amp; Purpose</string>
     <string name="who_to_give">Who to give and receive</string>
@@ -37,12 +37,15 @@
     <string name="title_activity_rikaz">RikazActivity</string>
     <string name="title_activity_gold">GoldActivity</string>
     <string name="title_activity_silver">SilverActivity</string>
+    <string name="title_activity_splash">SplashActivity</string>
 
     <string name="back">Back</string>
     <string name="my_asset">My asset</string>
     <string name="silver_zakat_description">Zakat is due when you own enough silver for a full lunar year (hawl).</string>
     <string name="paid">Paid!</string>
     <string name="not_yet_paid">Not yet paid!</string>
+    <string name="you_are_qualified">You are Qualified!</string>
+    <string name="fulfilled_in_lunar_year">Fulfilled in %1$d</string>
     <string name="once_per_year">once per year</string>
     <string name="mark_as_done">Mark as done</string>
     <string name="edit">Edit</string>
@@ -126,6 +129,7 @@
     <string name="price_per">Price per</string>
     <string name="unit">Unit</string>
     <string name="total_result">Total Result</string>
+    <string name="zakat_calculation">Zakat calculation</string>
     <string name="fitrah_do_i_have_to_pay_content">Zakat al-Fitr is required for every Muslim at the end of Ramadan. It is a small amount of food or its cash value for the poor.</string>
     <string name="fitrah_how_to_pay_content">Pay with staple food (rice, wheat, dates) or cash. The amount is one sa’ (about 2.5 kg) of staple food.</string>
 
@@ -212,7 +216,15 @@
     <string name="date_pattern_hijrah_month_year">MMMM yyyy</string>
     <string name="date_pattern_gregorian_day_month_year">dd MMMM yyyy</string>
     <string name="hijrah_date_with_suffix">%1$s AH</string>
-    <string name="quoted_text">"%1$s"</string>
+    <string name="quoted_text">\"%1$s\"</string>
+    <string name="badge_qualified">Qualified</string>
+    <string name="badge_fulfilled">Fulfilled</string>
+    <string name="loading_please_wait">Loading please wait</string>
+    <string name="loading_with_progress">Loading %1$d%%</string>
+    <string name="exit_dialog_title">Exit app?</string>
+    <string name="exit_dialog_message">Are you sure you want to exit Zakat Calculator?</string>
+    <string name="exit">Exit</string>
+    <string name="cancel">Cancel</string>
 
 </resources>
 

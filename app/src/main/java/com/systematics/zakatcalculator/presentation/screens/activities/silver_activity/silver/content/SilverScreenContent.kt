@@ -107,6 +107,7 @@ fun SilverScreenContent(
 
                     CommonPaidStatusCard(
                         isPaid = state.isPaid,
+                        isQualified = state.requirement1 && state.requirement2 && state.requirement3,
                         onTogglePaidStatus = { onEvent(SilverEvent.TogglePaidStatus) }
                     )
 
@@ -288,6 +289,7 @@ fun SilverCalculatorTabContent(state: SilverState, onEvent: (SilverEvent) -> Uni
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
+            if (state.calculationResult == null) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = stringResource(R.string.calculate_zakat_silver),
@@ -401,6 +403,7 @@ fun SilverCalculatorTabContent(state: SilverState, onEvent: (SilverEvent) -> Uni
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
+            }
             }
 
             // Result Area
@@ -557,6 +560,10 @@ fun SilverCalculatorTabContent(state: SilverState, onEvent: (SilverEvent) -> Uni
                             SummaryRow(stringResource(R.string.silver_quantity), state.silverQuantity)
                             SummaryRow(stringResource(R.string.silver_price), state.silverPrice)
                             SummaryRow(stringResource(R.string.nisab), stringResource(R.string.silver_nisab_value))
+                            SummaryRow(
+                                stringResource(R.string.zakat_calculation),
+                                "${state.silverQuantity.ifBlank { "0" }} x 2.5%"
+                            )
                             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                             val resultText = when (val calc = state.calculationResult) {
                                 is SilverCalculationResult.Success -> "${calc.cash} ${stringResource(R.string.cash)}"

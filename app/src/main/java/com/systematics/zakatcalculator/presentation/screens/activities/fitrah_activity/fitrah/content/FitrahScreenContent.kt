@@ -99,6 +99,7 @@ fun FitrahScreenContent(
 
                 CommonPaidStatusCard(
                     isPaid = state.isPaid,
+                    isQualified = state.canGiveRice && state.hasExcessFood,
                     onTogglePaidStatus = { onEvent(FitrahEvent.TogglePaidStatus) }
                 )
 
@@ -146,157 +147,159 @@ fun CalculatorSection(context: Context, state: FitrahState, onEvent: (FitrahEven
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = stringResource(R.string.calculate_zakat_fitrah),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-            Text(
-                text = stringResource(R.string.fitrah_calculation_prompt),
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-
-            CommonInputFieldLabel(stringResource(R.string.number_of_people))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(32.dp))
-                    .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(32.dp))
-                    .padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = state.numberOfPeople.toString().padStart(2, '0'),
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 16.dp),
-                    fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                IconButton(
-                    onClick = { onEvent(FitrahEvent.IncrementPeople) },
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.primary, CircleShape)
-                        .size(32.dp)
-                ) {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(20.dp)
+            if (state.result == null) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(R.string.calculate_zakat_fitrah),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.weight(1f)
                     )
                 }
-                Spacer(modifier = Modifier.width(8.dp))
-                IconButton(
-                    onClick = { onEvent(FitrahEvent.DecrementPeople) },
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.primary, CircleShape)
-                        .size(32.dp)
-                ) {
-                    Icon(
-                        Icons.Default.Remove,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
+                Text(
+                    text = stringResource(R.string.fitrah_calculation_prompt),
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
 
-            val payWithOptions = FitrahPayWith.entries
-            CommonInputFieldLabel(stringResource(R.string.pay_with))
-            CommonDropdownField(
-                value = stringResource(state.payWith.labelRes),
-                options = payWithOptions.map { stringResource(it.labelRes) }
-            ) { selectedLabel ->
-                val selected = payWithOptions.first { context.getString(it.labelRes) == selectedLabel }
-                onEvent(FitrahEvent.UpdatePayWith(selected))
-            }
-
-            val unitOptions = FitrahUnit.entries
-            CommonInputFieldLabel(stringResource(R.string.unit_of_rice))
-            CommonDropdownField(
-                value = stringResource(state.unit.labelRes),
-                options = unitOptions.map { stringResource(it.labelRes) }
-            ) { selectedLabel ->
-                val selected = unitOptions.first { context.getString(it.labelRes) == selectedLabel }
-                onEvent(FitrahEvent.UpdateUnit(selected))
-            }
-
-            if (state.payWith == FitrahPayWith.MONEY) {
+                CommonInputFieldLabel(stringResource(R.string.number_of_people))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                        .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(32.dp))
+                        .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(32.dp))
+                        .padding(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    CommonInputFieldLabel(
-                        stringResource(R.string.price_of_rice),
-                        Modifier.padding(top = 0.dp)
-                    )
                     Text(
-                        text = stringResource(R.string.find_current_price),
-                        color = MaterialTheme.colorScheme.primary,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.clickable {
-                            Utils.searchOnWeb(
-                                context = context,
-                                query = context.getString(
-                                    if (state.unit == FitrahUnit.KG) {
-                                        R.string.rice_price_per_kg
-                                    } else {
-                                        R.string.rice_price_per_litre
-                                    }
+                        text = state.numberOfPeople.toString().padStart(2, '0'),
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 16.dp),
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    IconButton(
+                        onClick = { onEvent(FitrahEvent.IncrementPeople) },
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.primary, CircleShape)
+                            .size(32.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    IconButton(
+                        onClick = { onEvent(FitrahEvent.DecrementPeople) },
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.primary, CircleShape)
+                            .size(32.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Remove,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+
+                val payWithOptions = FitrahPayWith.entries
+                CommonInputFieldLabel(stringResource(R.string.pay_with))
+                CommonDropdownField(
+                    value = stringResource(state.payWith.labelRes),
+                    options = payWithOptions.map { stringResource(it.labelRes) }
+                ) { selectedLabel ->
+                    val selected = payWithOptions.first { context.getString(it.labelRes) == selectedLabel }
+                    onEvent(FitrahEvent.UpdatePayWith(selected))
+                }
+
+                val unitOptions = FitrahUnit.entries
+                CommonInputFieldLabel(stringResource(R.string.unit_of_rice))
+                CommonDropdownField(
+                    value = stringResource(state.unit.labelRes),
+                    options = unitOptions.map { stringResource(it.labelRes) }
+                ) { selectedLabel ->
+                    val selected = unitOptions.first { context.getString(it.labelRes) == selectedLabel }
+                    onEvent(FitrahEvent.UpdateUnit(selected))
+                }
+
+                if (state.payWith == FitrahPayWith.MONEY) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CommonInputFieldLabel(
+                            stringResource(R.string.price_of_rice),
+                            Modifier.padding(top = 0.dp)
+                        )
+                        Text(
+                            text = stringResource(R.string.find_current_price),
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.clickable {
+                                Utils.searchOnWeb(
+                                    context = context,
+                                    query = context.getString(
+                                        if (state.unit == FitrahUnit.KG) {
+                                            R.string.rice_price_per_kg
+                                        } else {
+                                            R.string.rice_price_per_litre
+                                        }
+                                    )
                                 )
+                            }
+                        )
+                    }
+
+                    OutlinedTextField(
+                        value = state.pricePerUnit,
+                        onValueChange = { onEvent(FitrahEvent.UpdatePrice(it)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(32.dp),
+                        trailingIcon = {
+                            Text(
+                                "${stringResource(R.string.per)} ${stringResource(state.unit.labelRes)}",
+                                modifier = Modifier.padding(end = 16.dp),
+                                color = MaterialTheme.colorScheme.outline
                             )
-                        }
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface
+                        )
                     )
                 }
 
-                OutlinedTextField(
-                    value = state.pricePerUnit,
-                    onValueChange = { onEvent(FitrahEvent.UpdatePrice(it)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(32.dp),
-                    trailingIcon = {
-                        Text(
-                            "${stringResource(R.string.per)} ${stringResource(state.unit.labelRes)}",
-                            modifier = Modifier.padding(end = 16.dp),
-                            color = MaterialTheme.colorScheme.outline
-                        )
-                    },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.primary,
-                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Button(
+                    onClick = { onEvent(FitrahEvent.Calculate) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                    shape = RoundedCornerShape(32.dp)
+                ) {
+                    Text(
+                        stringResource(R.string.calculate),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
                     )
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                onClick = { onEvent(FitrahEvent.Calculate) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                shape = RoundedCornerShape(32.dp)
-            ) {
-                Text(
-                    stringResource(R.string.calculate),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                }
             }
 
             state.result?.let { result ->
@@ -417,6 +420,13 @@ fun CalculatorSection(context: Context, state: FitrahState, onEvent: (FitrahEven
                             } else {
                                 SummaryRow(stringResource(R.string.unit), stringResource(state.unit.labelRes))
                             }
+                            val multiplier = if (state.unit == FitrahUnit.KG) "2.5 ${stringResource(R.string.unit_kg)}" else "3.5 ${stringResource(R.string.unit_litre)}"
+                            val calculationText = if (state.payWith == FitrahPayWith.MONEY) {
+                                "${state.numberOfPeople} x ${state.pricePerUnit.ifBlank { "0" }} x $multiplier"
+                            } else {
+                                "${state.numberOfPeople} x $multiplier"
+                            }
+                            SummaryRow(stringResource(R.string.zakat_calculation), calculationText)
                             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                             SummaryRow(
                                 stringResource(R.string.total_result),

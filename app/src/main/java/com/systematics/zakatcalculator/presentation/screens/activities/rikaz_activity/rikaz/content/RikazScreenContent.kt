@@ -93,6 +93,7 @@ fun RikazScreenContent(
 
                 CommonPaidStatusCard(
                     isPaid = state.isPaid,
+                    isQualified = state.requirement1,
                     onTogglePaidStatus = { onEvent(RikazEvent.TogglePaidStatus) }
                 )
 
@@ -239,42 +240,44 @@ private fun RikazCalculatorSection(state: RikazState, onEvent: (RikazEvent) -> U
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            if (state.zakatAmount == null) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(R.string.calculate_zakat_rikaz),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Text(
-                    text = stringResource(R.string.calculate_zakat_rikaz),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.weight(1f)
+                    text = stringResource(R.string.rikaz_calculation_prompt),
+                    color = MaterialTheme.colorScheme.onSurface
                 )
-            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = stringResource(R.string.rikaz_calculation_prompt),
-                color = MaterialTheme.colorScheme.onSurface
-            )
+                OutlinedTextField(
+                    value = state.treasureValue,
+                    onValueChange = { onEvent(RikazEvent.UpdateTreasureValue(it)) },
+                    label = { Text(stringResource(R.string.value_of_treasure)) },
+                    placeholder = { Text(stringResource(R.string.amount)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = state.treasureValue,
-                onValueChange = { onEvent(RikazEvent.UpdateTreasureValue(it)) },
-                label = { Text(stringResource(R.string.value_of_treasure)) },
-                placeholder = { Text(stringResource(R.string.amount)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = { onEvent(RikazEvent.CalculateZakat) },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                Text(text = stringResource(R.string.calculate))
+                Button(
+                    onClick = { onEvent(RikazEvent.CalculateZakat) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text(text = stringResource(R.string.calculate))
+                }
             }
 
             state.zakatAmount?.let { amount ->
@@ -354,6 +357,10 @@ private fun RikazCalculatorSection(state: RikazState, onEvent: (RikazEvent) -> U
                             Spacer(modifier = Modifier.height(8.dp))
 
                             SummaryRow(stringResource(R.string.value_of_treasure), state.treasureValue)
+                            SummaryRow(
+                                stringResource(R.string.zakat_calculation),
+                                "${state.treasureValue.ifBlank { "0" }} x 20%"
+                            )
                             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                             SummaryRow(
                                 stringResource(R.string.total_result),

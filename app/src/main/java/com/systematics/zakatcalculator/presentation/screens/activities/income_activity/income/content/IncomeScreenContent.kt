@@ -100,6 +100,7 @@ fun IncomeScreenContent(
 
                 CommonPaidStatusCard(
                     isPaid = state.isPaid,
+                    isQualified = state.requirement1 && state.requirement2 && state.requirement3 && state.requirement4,
                     onTogglePaidStatus = { onEvent(IncomeEvent.TogglePaidStatus) }
                 )
 
@@ -293,73 +294,75 @@ private fun IncomeCalculatorSection(state: IncomeState, onEvent: (IncomeEvent) -
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            if (state.calculationResult == null) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(R.string.calculate_zakat_income),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Text(
-                    text = stringResource(R.string.calculate_zakat_income),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.weight(1f)
+                    text = stringResource(R.string.income_calculation_prompt),
+                    color = MaterialTheme.colorScheme.onSurface
                 )
-            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = stringResource(R.string.income_calculation_prompt),
-                color = MaterialTheme.colorScheme.onSurface
-            )
+                OutlinedTextField(
+                    value = state.income,
+                    onValueChange = { onEvent(IncomeEvent.UpdateIncome(it)) },
+                    label = { Text(stringResource(R.string.income_label)) },
+                    placeholder = { Text(stringResource(R.string.income_placeholder)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-            OutlinedTextField(
-                value = state.income,
-                onValueChange = { onEvent(IncomeEvent.UpdateIncome(it)) },
-                label = { Text(stringResource(R.string.income_label)) },
-                placeholder = { Text(stringResource(R.string.income_placeholder)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
+                OutlinedTextField(
+                    value = state.expense,
+                    onValueChange = { onEvent(IncomeEvent.UpdateExpense(it)) },
+                    label = { Text(stringResource(R.string.expense_label)) },
+                    placeholder = { Text(stringResource(R.string.expense_placeholder)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = state.expense,
-                onValueChange = { onEvent(IncomeEvent.UpdateExpense(it)) },
-                label = { Text(stringResource(R.string.expense_label)) },
-                placeholder = { Text(stringResource(R.string.expense_placeholder)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
+                Text(
+                    stringResource(R.string.gold_price),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = state.goldPrice,
+                    onValueChange = { onEvent(IncomeEvent.UpdateGoldPrice(it)) },
+                    label = { Text(stringResource(R.string.current_gold_price_per_gram)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            Text(
-                stringResource(R.string.gold_price),
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+                TextButton(onClick = { Utils.searchOnWeb(context, context.getString(R.string.gold_price_per_gram)) }) {
+                    Text(text = stringResource(R.string.find_current_price))
+                }
 
-            OutlinedTextField(
-                value = state.goldPrice,
-                onValueChange = { onEvent(IncomeEvent.UpdateGoldPrice(it)) },
-                label = { Text(stringResource(R.string.current_gold_price_per_gram)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            TextButton(onClick = { Utils.searchOnWeb(context, context.getString(R.string.gold_price_per_gram)) }) {
-                Text(text = stringResource(R.string.find_current_price))
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = { onEvent(IncomeEvent.Calculate) },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                Text(text = stringResource(R.string.calculate))
+                Button(
+                    onClick = { onEvent(IncomeEvent.Calculate) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text(text = stringResource(R.string.calculate))
+                }
             }
 
             state.calculationResult?.let { result ->
@@ -450,6 +453,10 @@ private fun IncomeCalculatorSection(state: IncomeState, onEvent: (IncomeEvent) -
                             SummaryRow(stringResource(R.string.income_label), state.income)
                             SummaryRow(stringResource(R.string.expense_label), state.expense)
                             SummaryRow(stringResource(R.string.gold_price), state.goldPrice)
+                            SummaryRow(
+                                stringResource(R.string.zakat_calculation),
+                                "(${state.income.ifBlank { "0" }} - ${state.expense.ifBlank { "0" }}) x 2.5%"
+                            )
 
                             val netIncome = ((state.income.toDoubleOrNull() ?: 0.0) - (state.expense.toDoubleOrNull()
                                 ?: 0.0)).coerceAtLeast(0.0)

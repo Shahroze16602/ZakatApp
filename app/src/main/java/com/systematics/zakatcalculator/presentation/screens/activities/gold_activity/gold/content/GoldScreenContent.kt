@@ -76,6 +76,7 @@ fun GoldScreenContent(
 
                     CommonPaidStatusCard(
                         isPaid = state.isPaid,
+                        isQualified = state.requirement1 && state.requirement2 && state.requirement3,
                         onTogglePaidStatus = { onEvent(GoldEvent.TogglePaidStatus) }
                     )
 
@@ -239,124 +240,125 @@ fun CalculatorTabContent(state: GoldState, onEvent: (GoldEvent) -> Unit) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = stringResource(R.string.calculate_zakat_gold),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            if (state.calculationResult == null) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(R.string.calculate_zakat_gold),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
 
-            Text(
-                text = stringResource(R.string.gold_calculation_prompt),
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(vertical = 12.dp)
-            )
-
-            // Nisab Toggle UI
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
                 Text(
-                    stringResource(R.string.nisab),
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(end = 16.dp)
+                    text = stringResource(R.string.gold_calculation_prompt),
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(vertical = 12.dp)
                 )
+
                 Row(
                     modifier = Modifier
-                        .border(
-                            1.dp,
-                            MaterialTheme.colorScheme.onSurfaceVariant,
-                            RoundedCornerShape(4.dp)
-                        )
-                        .clip(RoundedCornerShape(4.dp))
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    NisabOption(
-                        labelRes = R.string.gold_nisab_value_1,
-                        isSelected = state.nisabTypeRes == R.string.gold_nisab_value_1
-                    ) { onEvent(GoldEvent.UpdateNisabType(it)) }
-                    NisabOption(
-                        labelRes = R.string.gold_nisab_value_2,
-                        isSelected = state.nisabTypeRes == R.string.gold_nisab_value_2
-                    ) { onEvent(GoldEvent.UpdateNisabType(it)) }
-                }
-                Spacer(modifier = Modifier.width(16.dp))
-            }
-
-            CommonInputFieldLabel(stringResource(R.string.gold_quantity))
-            OutlinedTextField(
-                value = state.goldQuantity,
-                onValueChange = { onEvent(GoldEvent.UpdateGoldQuantity(it)) },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text(stringResource(R.string.gold_quantity_placeholder)) },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    stringResource(R.string.gold_price),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.weight(1f)
-                )
-                Icon(
-                    Icons.Default.Search,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    stringResource(R.string.find_current_price),
-                    color = MaterialTheme.colorScheme.primary,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable {
-                        Utils.searchOnWeb(context, context.getString(R.string.gold_price_per_gram))
+                    Text(
+                        stringResource(R.string.nisab),
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(end = 16.dp)
+                    )
+                    Row(
+                        modifier = Modifier
+                            .border(
+                                1.dp,
+                                MaterialTheme.colorScheme.onSurfaceVariant,
+                                RoundedCornerShape(4.dp)
+                            )
+                            .clip(RoundedCornerShape(4.dp))
+                    ) {
+                        NisabOption(
+                            labelRes = R.string.gold_nisab_value_1,
+                            isSelected = state.nisabTypeRes == R.string.gold_nisab_value_1
+                        ) { onEvent(GoldEvent.UpdateNisabType(it)) }
+                        NisabOption(
+                            labelRes = R.string.gold_nisab_value_2,
+                            isSelected = state.nisabTypeRes == R.string.gold_nisab_value_2
+                        ) { onEvent(GoldEvent.UpdateNisabType(it)) }
                     }
+                    Spacer(modifier = Modifier.width(16.dp))
+                }
+
+                CommonInputFieldLabel(stringResource(R.string.gold_quantity))
+                OutlinedTextField(
+                    value = state.goldQuantity,
+                    onValueChange = { onEvent(GoldEvent.UpdateGoldQuantity(it)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text(stringResource(R.string.gold_quantity_placeholder)) },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 )
-            }
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = state.goldPrice,
-                onValueChange = { onEvent(GoldEvent.UpdateGoldPrice(it)) },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text(stringResource(R.string.gold_price_placeholder)) },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        stringResource(R.string.gold_price),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Icon(
+                        Icons.Default.Search,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        stringResource(R.string.find_current_price),
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.clickable {
+                            Utils.searchOnWeb(context, context.getString(R.string.gold_price_per_gram))
+                        }
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = state.goldPrice,
+                    onValueChange = { onEvent(GoldEvent.UpdateGoldPrice(it)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text(stringResource(R.string.gold_price_placeholder)) },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 )
-            )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            Button(
-                onClick = { onEvent(GoldEvent.Calculate) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                shape = RoundedCornerShape(28.dp)
-            ) {
-                Text(
-                    stringResource(R.string.calculate),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
+                Button(
+                    onClick = { onEvent(GoldEvent.Calculate) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                    shape = RoundedCornerShape(28.dp)
+                ) {
+                    Text(
+                        stringResource(R.string.calculate),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                }
             }
 
             // Result Area
@@ -513,6 +515,10 @@ fun CalculatorTabContent(state: GoldState, onEvent: (GoldEvent) -> Unit) {
                             SummaryRow(stringResource(R.string.gold_quantity), state.goldQuantity)
                             SummaryRow(stringResource(R.string.gold_price), state.goldPrice)
                             SummaryRow(stringResource(R.string.nisab), stringResource(state.nisabTypeRes))
+                            SummaryRow(
+                                stringResource(R.string.zakat_calculation),
+                                "${state.goldQuantity.ifBlank { "0" }} x 2.5%"
+                            )
                             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                             val resultText = when (val calc = state.calculationResult) {
                                 is GoldCalculationResult.Success -> "${calc.cash} ${stringResource(R.string.cash)}"
