@@ -67,8 +67,6 @@ fun GoldScreenContent(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
-
                 Column(modifier = Modifier.padding(16.dp)) {
                     CommonInfoBox(text = stringResource(R.string.gold_zakat_description))
 
@@ -233,14 +231,15 @@ fun RequirementItem(
 fun CalculatorTabContent(state: GoldState, onEvent: (GoldEvent) -> Unit) {
     val context = LocalContext.current
 
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(24.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(24.dp)) {
-            if (state.calculationResult == null) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        if (state.calculationResult == null) {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                shape = RoundedCornerShape(24.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(24.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = stringResource(R.string.calculate_zakat_gold),
@@ -360,177 +359,186 @@ fun CalculatorTabContent(state: GoldState, onEvent: (GoldEvent) -> Unit) {
                     )
                 }
             }
+            }
+        }
 
-            // Result Area
-            state.calculationResult?.let { result ->
-                Spacer(modifier = Modifier.height(24.dp))
+        // Result Area
+        state.calculationResult?.let { result ->
+            Spacer(modifier = Modifier.height(24.dp))
 
-                when (result) {
-                    is GoldCalculationResult.Success -> {
-                        Card(
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                            shape = RoundedCornerShape(24.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Column(modifier = Modifier.padding(24.dp)) {
-                                Text(
-                                    stringResource(R.string.calculation_result),
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    stringResource(R.string.gold_zakat_options),
-                                    fontSize = 14.sp,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Text(
-                                    "${result.grams} ${stringResource(R.string.grams_of_gold)}",
-                                    fontWeight = FontWeight.ExtraBold,
-                                    fontSize = 18.sp
-                                )
-                                Text(
-                                    stringResource(R.string.or),
-                                    fontSize = 14.sp,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    modifier = Modifier.padding(vertical = 4.dp)
-                                )
-                                Text(
-                                    "${result.cash} ${stringResource(R.string.cash)}",
-                                    fontWeight = FontWeight.ExtraBold,
-                                    fontSize = 18.sp
-                                )
+            when (result) {
+                is GoldCalculationResult.Success -> {
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                        ),
+                        shape = RoundedCornerShape(24.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(24.dp)) {
+                            Text(
+                                stringResource(R.string.calculation_result),
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                stringResource(R.string.gold_zakat_options),
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                "${result.grams} ${stringResource(R.string.grams_of_gold)}",
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 18.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                stringResource(R.string.or),
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(vertical = 4.dp)
+                            )
+                            Text(
+                                "${result.cash} ${stringResource(R.string.cash)}",
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 18.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
 
-                                Spacer(modifier = Modifier.height(24.dp))
+                            Spacer(modifier = Modifier.height(24.dp))
 
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Button(
-                                        onClick = { onEvent(GoldEvent.ToggleSummary) },
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .height(48.dp),
-                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                                        shape = RoundedCornerShape(24.dp)
-                                    ) {
-                                        Icon(
-                                            Icons.Default.Description,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(stringResource(R.string.summary))
-                                    }
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    IconButton(
-                                        onClick = { onEvent(GoldEvent.ResetCalculation) },
-                                        modifier = Modifier
-                                            .size(48.dp)
-                                            .background(
-                                                MaterialTheme.colorScheme.surface,
-                                                CircleShape
-                                            )
-                                    ) {
-                                        Icon(
-                                            Icons.Default.Refresh,
-                                            contentDescription = stringResource(R.string.reset)
-                                        )
-                                    }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Button(
+                                    onClick = { onEvent(GoldEvent.ToggleSummary) },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(48.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                    shape = RoundedCornerShape(24.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.Description,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(stringResource(R.string.summary))
                                 }
-                            }
-                        }
-                    }
-
-                    is GoldCalculationResult.BelowNisab -> {
-                        Card(
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                            shape = RoundedCornerShape(24.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Column(modifier = Modifier.padding(24.dp)) {
-                                Text(
-                                    stringResource(R.string.calculation_result),
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Text(
-                                    stringResource(R.string.gold_below_nisab_message),
-                                    fontSize = 14.sp,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                                Spacer(modifier = Modifier.height(24.dp))
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Button(
-                                        onClick = { onEvent(GoldEvent.ToggleSummary) },
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .height(48.dp),
-                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                                        shape = RoundedCornerShape(24.dp)
-                                    ) {
-                                        Icon(
-                                            Icons.Default.Description,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(18.dp)
+                                Spacer(modifier = Modifier.width(12.dp))
+                                IconButton(
+                                    onClick = { onEvent(GoldEvent.ResetCalculation) },
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .background(
+                                            MaterialTheme.colorScheme.surface,
+                                            CircleShape
                                         )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(stringResource(R.string.summary))
-                                    }
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    IconButton(
-                                        onClick = { onEvent(GoldEvent.ResetCalculation) },
-                                        modifier = Modifier
-                                            .size(48.dp)
-                                            .background(
-                                                MaterialTheme.colorScheme.surface,
-                                                CircleShape
-                                            )
-                                    ) {
-                                        Icon(
-                                            Icons.Default.Refresh,
-                                            contentDescription = stringResource(R.string.reset)
-                                        )
-                                    }
+                                ) {
+                                    Icon(
+                                        Icons.Default.Refresh,
+                                        contentDescription = stringResource(R.string.reset)
+                                    )
                                 }
                             }
                         }
                     }
                 }
 
-                if (state.showSummary) {
-                    Spacer(modifier = Modifier.height(16.dp))
+                is GoldCalculationResult.BelowNisab -> {
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        shape = RoundedCornerShape(16.dp),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                        ),
+                        shape = RoundedCornerShape(24.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
+                        Column(modifier = Modifier.padding(24.dp)) {
                             Text(
-                                text = stringResource(R.string.calculation_summary),
+                                stringResource(R.string.calculation_result),
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontSize = 16.sp
+                                color = MaterialTheme.colorScheme.onSurface
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            SummaryRow(stringResource(R.string.gold_quantity), state.goldQuantity)
-                            SummaryRow(stringResource(R.string.gold_price), state.goldPrice)
-                            SummaryRow(stringResource(R.string.nisab), stringResource(state.nisabTypeRes))
-                            SummaryRow(
-                                stringResource(R.string.zakat_calculation),
-                                "${state.goldQuantity.ifBlank { "0" }} x 2.5%"
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                stringResource(R.string.gold_below_nisab_message),
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                            val resultText = when (val calc = state.calculationResult) {
-                                is GoldCalculationResult.Success -> "${calc.cash} ${stringResource(R.string.cash)}"
-                                is GoldCalculationResult.BelowNisab -> stringResource(R.string.not_required)
-                                else -> ""
+                            Spacer(modifier = Modifier.height(24.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Button(
+                                    onClick = { onEvent(GoldEvent.ToggleSummary) },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(48.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                    shape = RoundedCornerShape(24.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.Description,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(stringResource(R.string.summary))
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
+                                IconButton(
+                                    onClick = { onEvent(GoldEvent.ResetCalculation) },
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .background(
+                                            MaterialTheme.colorScheme.surface,
+                                            CircleShape
+                                        )
+                                ) {
+                                    Icon(
+                                        Icons.Default.Refresh,
+                                        contentDescription = stringResource(R.string.reset)
+                                    )
+                                }
                             }
-                            SummaryRow(
-                                stringResource(R.string.total_result),
-                                resultText,
-                                isBold = true
-                            )
                         }
+                    }
+                }
+            }
+
+            if (state.showSummary) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    shape = RoundedCornerShape(16.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = stringResource(R.string.calculation_summary),
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 16.sp
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        SummaryRow(stringResource(R.string.gold_quantity), state.goldQuantity)
+                        SummaryRow(stringResource(R.string.gold_price), state.goldPrice)
+                        SummaryRow(stringResource(R.string.nisab), stringResource(state.nisabTypeRes))
+                        SummaryRow(
+                            stringResource(R.string.zakat_calculation),
+                            "${state.goldQuantity.ifBlank { "0" }} x 2.5%"
+                        )
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        val resultText = when (val calc = state.calculationResult) {
+                            is GoldCalculationResult.Success -> "${calc.cash} ${stringResource(R.string.cash)}"
+                            is GoldCalculationResult.BelowNisab -> stringResource(R.string.not_required)
+                            else -> ""
+                        }
+                        SummaryRow(
+                            stringResource(R.string.total_result),
+                            resultText,
+                            isBold = true
+                        )
                     }
                 }
             }
@@ -577,7 +585,8 @@ fun NisabOption(labelRes: Int, isSelected: Boolean, onClick: (Int) -> Unit) {
 
 @Composable
 fun ZakatInfoTabContent() {
-    var expandedItem by remember { mutableStateOf<Int?>(null) }
+    var isDoIHaveToPayExpanded by remember { mutableStateOf(false) }
+    var isHowToPayExpanded by remember { mutableStateOf(false) }
 
     Column {
         Text(
@@ -596,8 +605,8 @@ fun ZakatInfoTabContent() {
         CommonInfoExpandableItem(
             title = stringResource(R.string.do_i_have_to_pay),
             content = stringResource(R.string.gold_do_i_have_to_pay_content),
-            isExpanded = expandedItem == 0,
-            onToggle = { expandedItem = if (expandedItem == 0) null else 0 }
+            isExpanded = isDoIHaveToPayExpanded,
+            onToggle = { isDoIHaveToPayExpanded = !isDoIHaveToPayExpanded }
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -605,8 +614,8 @@ fun ZakatInfoTabContent() {
         CommonInfoExpandableItem(
             title = stringResource(R.string.how_to_pay),
             content = stringResource(R.string.gold_how_to_pay_content),
-            isExpanded = expandedItem == 1,
-            onToggle = { expandedItem = if (expandedItem == 1) null else 1 }
+            isExpanded = isHowToPayExpanded,
+            onToggle = { isHowToPayExpanded = !isHowToPayExpanded }
         )
     }
 }

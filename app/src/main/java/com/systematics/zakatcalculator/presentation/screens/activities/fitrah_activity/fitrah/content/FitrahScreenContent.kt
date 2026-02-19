@@ -140,14 +140,15 @@ fun FitrahScreenContent(
 
 @Composable
 fun CalculatorSection(context: Context, state: FitrahState, onEvent: (FitrahEvent) -> Unit) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            if (state.result == null) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        if (state.result == null) {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = stringResource(R.string.calculate_zakat_fitrah),
@@ -301,142 +302,149 @@ fun CalculatorSection(context: Context, state: FitrahState, onEvent: (FitrahEven
                     )
                 }
             }
+            }
+        }
 
-            state.result?.let { result ->
-                Spacer(modifier = Modifier.height(24.dp))
+        state.result?.let { result ->
+            Spacer(modifier = Modifier.height(24.dp))
 
-                // Calculation Result Card
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                    shape = RoundedCornerShape(24.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.padding(24.dp)) {
-                        Text(
-                            text = stringResource(R.string.calculation_result),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = stringResource(R.string.fitrah_zakat_result_prompt),
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = when (result) {
-                                is FitrahResult.Money -> result.amount
-                                is FitrahResult.Rice -> "${result.amount} ${stringResource(result.unit.labelRes)}"
-                            },
-                            fontSize = 32.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                        Text(
-                            text = if (state.payWith == FitrahPayWith.MONEY) stringResource(
-                                R.string.total_amount_in_money
-                            ) else stringResource(R.string.kg_of_rice_or_staple_food),
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                        )
+            // Calculation Result Card
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                ),
+                shape = RoundedCornerShape(24.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(24.dp)) {
+                    Text(
+                        text = stringResource(R.string.calculation_result),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(R.string.fitrah_zakat_result_prompt),
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = when (result) {
+                            is FitrahResult.Money -> result.amount
+                            is FitrahResult.Rice -> "${result.amount} ${stringResource(result.unit.labelRes)}"
+                        },
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = if (state.payWith == FitrahPayWith.MONEY) stringResource(
+                            R.string.total_amount_in_money
+                        ) else stringResource(R.string.kg_of_rice_or_staple_food),
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Button(
+                            onClick = { onEvent(FitrahEvent.ToggleSummary) },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(56.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                            shape = RoundedCornerShape(28.dp)
                         ) {
-                            Button(
-                                onClick = { onEvent(FitrahEvent.ToggleSummary) },
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(56.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                                shape = RoundedCornerShape(28.dp)
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        Icons.Default.Description,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        stringResource(R.string.summary),
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                            }
-
-                            IconButton(
-                                onClick = { onEvent(FitrahEvent.Reset) },
-                                modifier = Modifier
-                                    .size(56.dp)
-                                    .background(MaterialTheme.colorScheme.surface, CircleShape)
-                            ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
-                                    Icons.Default.Refresh,
-                                    contentDescription = stringResource(R.string.reset),
-                                    tint = MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier.size(28.dp)
+                                    Icons.Default.Description,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    stringResource(R.string.summary),
+                                    fontWeight = FontWeight.Bold
                                 )
                             }
+                        }
+
+                        IconButton(
+                            onClick = { onEvent(FitrahEvent.Reset) },
+                            modifier = Modifier
+                                .size(56.dp)
+                                .background(MaterialTheme.colorScheme.surface, CircleShape)
+                        ) {
+                            Icon(
+                                Icons.Default.Refresh,
+                                contentDescription = stringResource(R.string.reset),
+                                tint = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.size(28.dp)
+                            )
                         }
                     }
                 }
+            }
 
-                if (state.showSummary) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        shape = RoundedCornerShape(16.dp),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text = stringResource(R.string.calculation_summary),
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontSize = 16.sp
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
+            if (state.showSummary) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    shape = RoundedCornerShape(16.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = stringResource(R.string.calculation_summary),
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 16.sp
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        SummaryRow(
+                            stringResource(R.string.number_of_people),
+                            "${state.numberOfPeople}"
+                        )
+                        SummaryRow(
+                            stringResource(R.string.payment_method),
+                            stringResource(state.payWith.labelRes)
+                        )
+                        if (state.payWith == FitrahPayWith.MONEY) {
                             SummaryRow(
-                                stringResource(R.string.number_of_people),
-                                "${state.numberOfPeople}"
+                                "${stringResource(R.string.price_per)} ${stringResource(state.unit.labelRes)}",
+                                state.pricePerUnit
                             )
-                            SummaryRow(
-                                stringResource(R.string.payment_method),
-                                stringResource(state.payWith.labelRes)
-                            )
-                            if (state.payWith == FitrahPayWith.MONEY) {
-                                SummaryRow(
-                                    "${stringResource(R.string.price_per)} ${stringResource(state.unit.labelRes)}",
-                                    state.pricePerUnit
-                                )
-                            } else {
-                                SummaryRow(stringResource(R.string.unit), stringResource(state.unit.labelRes))
-                            }
-                            val multiplier = if (state.unit == FitrahUnit.KG) "2.5 ${stringResource(R.string.unit_kg)}" else "3.5 ${stringResource(R.string.unit_litre)}"
-                            val calculationText = if (state.payWith == FitrahPayWith.MONEY) {
-                                "${state.numberOfPeople} x ${state.pricePerUnit.ifBlank { "0" }} x $multiplier"
-                            } else {
-                                "${state.numberOfPeople} x $multiplier"
-                            }
-                            SummaryRow(stringResource(R.string.zakat_calculation), calculationText)
-                            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                            SummaryRow(
-                                stringResource(R.string.total_result),
-                                when (result) {
-                                    is FitrahResult.Money -> result.amount
-                                    is FitrahResult.Rice -> "${result.amount} ${stringResource(result.unit.labelRes)}"
-                                },
-                                isBold = true
-                            )
+                        } else {
+                            SummaryRow(stringResource(R.string.unit), stringResource(state.unit.labelRes))
                         }
+                        val multiplier = if (state.unit == FitrahUnit.KG) {
+                            "2.5 ${stringResource(R.string.unit_kg)}"
+                        } else {
+                            "3.5 ${stringResource(R.string.unit_litre)}"
+                        }
+                        val calculationText = if (state.payWith == FitrahPayWith.MONEY) {
+                            "${state.numberOfPeople} x ${state.pricePerUnit.ifBlank { "0" }} x $multiplier"
+                        } else {
+                            "${state.numberOfPeople} x $multiplier"
+                        }
+                        SummaryRow(stringResource(R.string.zakat_calculation), calculationText)
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        SummaryRow(
+                            stringResource(R.string.total_result),
+                            when (result) {
+                                is FitrahResult.Money -> result.amount
+                                is FitrahResult.Rice -> "${result.amount} ${stringResource(result.unit.labelRes)}"
+                            },
+                            isBold = true
+                        )
                     }
                 }
             }
@@ -464,13 +472,14 @@ fun SummaryRow(label: String, value: String, isBold: Boolean = false) {
 
 @Composable
 fun InfoSection() {
-    var expandedItem by remember { mutableStateOf<Int?>(null) }
+    var isDoIHaveToPayExpanded by remember { mutableStateOf(false) }
+    var isHowToPayExpanded by remember { mutableStateOf(false) }
     Column {
         CommonInfoExpandableItem(
             title = stringResource(R.string.do_i_have_to_pay),
             content = stringResource(R.string.fitrah_do_i_have_to_pay_content),
-            isExpanded = expandedItem == 0,
-            onToggle = { expandedItem = if (expandedItem == 0) null else 0 }
+            isExpanded = isDoIHaveToPayExpanded,
+            onToggle = { isDoIHaveToPayExpanded = !isDoIHaveToPayExpanded }
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -478,8 +487,8 @@ fun InfoSection() {
         CommonInfoExpandableItem(
             title = stringResource(R.string.how_to_pay),
             content = stringResource(R.string.fitrah_how_to_pay_content),
-            isExpanded = expandedItem == 1,
-            onToggle = { expandedItem = if (expandedItem == 1) null else 1 }
+            isExpanded = isHowToPayExpanded,
+            onToggle = { isHowToPayExpanded = !isHowToPayExpanded }
         )
     }
 }

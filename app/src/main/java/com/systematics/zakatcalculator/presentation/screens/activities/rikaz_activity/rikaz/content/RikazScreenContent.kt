@@ -233,14 +233,15 @@ private fun RikazRequirementsSection(
 
 @Composable
 private fun RikazCalculatorSection(state: RikazState, onEvent: (RikazEvent) -> Unit) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            if (state.zakatAmount == null) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        if (state.zakatAmount == null) {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = stringResource(R.string.calculate_zakat_rikaz),
@@ -279,95 +280,98 @@ private fun RikazCalculatorSection(state: RikazState, onEvent: (RikazEvent) -> U
                     Text(text = stringResource(R.string.calculate))
                 }
             }
+            }
+        }
 
-            state.zakatAmount?.let { amount ->
-                Spacer(modifier = Modifier.height(24.dp))
+        state.zakatAmount?.let { amount ->
+            Spacer(modifier = Modifier.height(24.dp))
 
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                    shape = RoundedCornerShape(24.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.padding(24.dp)) {
-                        Text(
-                            text = stringResource(R.string.calculation_result),
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                ),
+                shape = RoundedCornerShape(24.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(24.dp)) {
+                    Text(
+                        text = stringResource(R.string.calculation_result),
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                        Text(
-                            text = amount,
-                            fontSize = 30.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                        Text(
-                            text = stringResource(R.string.cash),
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
+                    Text(
+                        text = amount,
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = stringResource(R.string.cash),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Button(
+                            onClick = { onEvent(RikazEvent.ToggleSummary) },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                         ) {
-                            Button(
-                                onClick = { onEvent(RikazEvent.ToggleSummary) },
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                            ) {
-                                Icon(Icons.Default.Description, contentDescription = null)
-                                Spacer(modifier = Modifier.size(8.dp))
-                                Text(stringResource(R.string.summary))
-                            }
+                            Icon(Icons.Default.Description, contentDescription = null)
+                            Spacer(modifier = Modifier.size(8.dp))
+                            Text(stringResource(R.string.summary))
+                        }
 
-                            IconButton(
-                                onClick = { onEvent(RikazEvent.ResetCalculation) },
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .background(MaterialTheme.colorScheme.surface, CircleShape)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Refresh,
-                                    contentDescription = stringResource(R.string.reset)
-                                )
-                            }
+                        IconButton(
+                            onClick = { onEvent(RikazEvent.ResetCalculation) },
+                            modifier = Modifier
+                                .size(48.dp)
+                                .background(MaterialTheme.colorScheme.surface, CircleShape)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = stringResource(R.string.reset)
+                            )
                         }
                     }
                 }
+            }
 
-                if (state.showSummary) {
-                    Spacer(modifier = Modifier.height(16.dp))
+            if (state.showSummary) {
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text = stringResource(R.string.calculation_summary),
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontSize = 16.sp
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = stringResource(R.string.calculation_summary),
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 16.sp
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                            SummaryRow(stringResource(R.string.value_of_treasure), state.treasureValue)
-                            SummaryRow(
-                                stringResource(R.string.zakat_calculation),
-                                "${state.treasureValue.ifBlank { "0" }} x 20%"
-                            )
-                            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                            SummaryRow(
-                                stringResource(R.string.total_result),
-                                amount,
-                                isBold = true
-                            )
-                        }
+                        SummaryRow(stringResource(R.string.value_of_treasure), state.treasureValue)
+                        SummaryRow(
+                            stringResource(R.string.zakat_calculation),
+                            "${state.treasureValue.ifBlank { "0" }} x 20%"
+                        )
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        SummaryRow(
+                            stringResource(R.string.total_result),
+                            amount,
+                            isBold = true
+                        )
                     }
                 }
             }
@@ -395,14 +399,15 @@ private fun SummaryRow(label: String, value: String, isBold: Boolean = false) {
 
 @Composable
 private fun RikazInfoSection() {
-    var expandedItem by remember { mutableStateOf<Int?>(null) }
+    var isDoIHaveToPayExpanded by remember { mutableStateOf(false) }
+    var isHowToPayExpanded by remember { mutableStateOf(false) }
 
     Column {
         CommonInfoExpandableItem(
             title = stringResource(R.string.do_i_have_to_pay),
             content = stringResource(R.string.rikaz_do_i_have_to_pay_content),
-            isExpanded = expandedItem == 0,
-            onToggle = { expandedItem = if (expandedItem == 0) null else 0 }
+            isExpanded = isDoIHaveToPayExpanded,
+            onToggle = { isDoIHaveToPayExpanded = !isDoIHaveToPayExpanded }
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -410,8 +415,8 @@ private fun RikazInfoSection() {
         CommonInfoExpandableItem(
             title = stringResource(R.string.how_to_pay),
             content = stringResource(R.string.rikaz_how_to_pay_content),
-            isExpanded = expandedItem == 1,
-            onToggle = { expandedItem = if (expandedItem == 1) null else 1 }
+            isExpanded = isHowToPayExpanded,
+            onToggle = { isHowToPayExpanded = !isHowToPayExpanded }
         )
     }
 }

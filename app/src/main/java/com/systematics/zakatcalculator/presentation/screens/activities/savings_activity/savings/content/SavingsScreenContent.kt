@@ -271,14 +271,15 @@ private fun RequirementItem(
 private fun SavingsCalculatorSection(state: SavingsState, onEvent: (SavingsEvent) -> Unit) {
     val context = LocalContext.current
 
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            if (state.calculationResult == null) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        if (state.calculationResult == null) {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = stringResource(R.string.calculate_zakat_savings),
@@ -365,121 +366,124 @@ private fun SavingsCalculatorSection(state: SavingsState, onEvent: (SavingsEvent
                     Text(text = stringResource(R.string.calculate))
                 }
             }
+            }
+        }
 
-            state.calculationResult?.let { result ->
-                Spacer(modifier = Modifier.height(24.dp))
+        state.calculationResult?.let { result ->
+            Spacer(modifier = Modifier.height(24.dp))
 
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                    shape = RoundedCornerShape(24.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.padding(24.dp)) {
-                        Text(
-                            text = stringResource(R.string.calculation_result),
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                ),
+                shape = RoundedCornerShape(24.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(24.dp)) {
+                    Text(
+                        text = stringResource(R.string.calculation_result),
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                        when (result) {
-                            is SavingsCalculationResult.Success -> {
-                                Text(
-                                    text = result.amount,
-                                    fontSize = 30.sp,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                                Text(
-                                    text = stringResource(R.string.cash),
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                            }
-
-                            SavingsCalculationResult.BelowNisab -> {
-                                Text(
-                                    text = stringResource(R.string.savings_below_nisab_message),
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                            }
+                    when (result) {
+                        is SavingsCalculationResult.Success -> {
+                            Text(
+                                text = result.amount,
+                                fontSize = 30.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.cash),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        SavingsCalculationResult.BelowNisab -> {
+                            Text(
+                                text = stringResource(R.string.savings_below_nisab_message),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Button(
+                            onClick = { onEvent(SavingsEvent.ToggleSummary) },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                         ) {
-                            Button(
-                                onClick = { onEvent(SavingsEvent.ToggleSummary) },
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                            ) {
-                                Icon(Icons.Default.Description, contentDescription = null)
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(stringResource(R.string.summary))
-                            }
+                            Icon(Icons.Default.Description, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(stringResource(R.string.summary))
+                        }
 
-                            IconButton(
-                                onClick = { onEvent(SavingsEvent.ResetCalculation) },
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .background(MaterialTheme.colorScheme.surface, CircleShape)
-                            ) {
-                                Icon(
-                                    Icons.Default.Refresh,
-                                    contentDescription = stringResource(R.string.reset)
-                                )
-                            }
+                        IconButton(
+                            onClick = { onEvent(SavingsEvent.ResetCalculation) },
+                            modifier = Modifier
+                                .size(48.dp)
+                                .background(MaterialTheme.colorScheme.surface, CircleShape)
+                        ) {
+                            Icon(
+                                Icons.Default.Refresh,
+                                contentDescription = stringResource(R.string.reset)
+                            )
                         }
                     }
                 }
+            }
 
-                if (state.showSummary) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text = stringResource(R.string.calculation_summary),
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontSize = 16.sp
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
+            if (state.showSummary) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = stringResource(R.string.calculation_summary),
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 16.sp
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                            SummaryRow(stringResource(R.string.savings_label), state.savings)
-                            SummaryRow(stringResource(R.string.interests_label), state.interests)
-                            SummaryRow(stringResource(R.string.gold_price), state.goldPrice)
-                            SummaryRow(
-                                stringResource(R.string.zakat_calculation),
-                                "(${state.savings.ifBlank { "0" }} - ${state.interests.ifBlank { "0" }}) x 2.5%"
-                            )
+                        SummaryRow(stringResource(R.string.savings_label), state.savings)
+                        SummaryRow(stringResource(R.string.interests_label), state.interests)
+                        SummaryRow(stringResource(R.string.gold_price), state.goldPrice)
+                        SummaryRow(
+                            stringResource(R.string.zakat_calculation),
+                            "(${state.savings.ifBlank { "0" }} - ${state.interests.ifBlank { "0" }}) x 2.5%"
+                        )
 
-                            val netSavings = ((state.savings.toDoubleOrNull() ?: 0.0) - (state.interests.toDoubleOrNull()
-                                ?: 0.0)).coerceAtLeast(0.0)
-                            val nisab = (state.goldPrice.toDoubleOrNull() ?: 0.0) * 85.0
+                        val netSavings = ((state.savings.toDoubleOrNull() ?: 0.0) - (state.interests.toDoubleOrNull()
+                            ?: 0.0)).coerceAtLeast(0.0)
+                        val nisab = (state.goldPrice.toDoubleOrNull() ?: 0.0) * 85.0
 
-                            SummaryRow(
-                                stringResource(R.string.net_savings),
-                                NumberFormatters.formatNoDecimals(netSavings)
-                            )
-                            SummaryRow(
-                                stringResource(R.string.nisab_threshold),
-                                NumberFormatters.formatNoDecimals(nisab)
-                            )
-                            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                            SummaryRow(
-                                stringResource(R.string.total_result),
-                                if (result is SavingsCalculationResult.Success) result.amount else stringResource(
-                                    R.string.not_required
-                                ),
-                                isBold = true
-                            )
-                        }
+                        SummaryRow(
+                            stringResource(R.string.net_savings),
+                            NumberFormatters.formatNoDecimals(netSavings)
+                        )
+                        SummaryRow(
+                            stringResource(R.string.nisab_threshold),
+                            NumberFormatters.formatNoDecimals(nisab)
+                        )
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        SummaryRow(
+                            stringResource(R.string.total_result),
+                            if (result is SavingsCalculationResult.Success) result.amount else stringResource(
+                                R.string.not_required
+                            ),
+                            isBold = true
+                        )
                     }
                 }
             }
@@ -507,14 +511,15 @@ private fun SummaryRow(label: String, value: String, isBold: Boolean = false) {
 
 @Composable
 private fun SavingsInfoSection() {
-    var expandedItem by remember { mutableStateOf<Int?>(null) }
+    var isDoIHaveToPayExpanded by remember { mutableStateOf(false) }
+    var isHowToPayExpanded by remember { mutableStateOf(false) }
 
     Column {
         CommonInfoExpandableItem(
             title = stringResource(R.string.do_i_have_to_pay),
             content = stringResource(R.string.savings_do_i_have_to_pay_content),
-            isExpanded = expandedItem == 0,
-            onToggle = { expandedItem = if (expandedItem == 0) null else 0 }
+            isExpanded = isDoIHaveToPayExpanded,
+            onToggle = { isDoIHaveToPayExpanded = !isDoIHaveToPayExpanded }
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -522,8 +527,8 @@ private fun SavingsInfoSection() {
         CommonInfoExpandableItem(
             title = stringResource(R.string.how_to_pay),
             content = stringResource(R.string.savings_how_to_pay_content),
-            isExpanded = expandedItem == 1,
-            onToggle = { expandedItem = if (expandedItem == 1) null else 1 }
+            isExpanded = isHowToPayExpanded,
+            onToggle = { isHowToPayExpanded = !isHowToPayExpanded }
         )
     }
 }
